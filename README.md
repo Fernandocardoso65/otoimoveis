@@ -19,8 +19,8 @@ Painel Administrativo:
      -  Adicionar, editar e excluir imóveis de forma dinâmica.
      -  Visualização dos imóveis cadastrados no painel.
       
-       Responsividade: Design adaptável para funcionar bem em dispositivos móveis e desktops.
-       Animações:  Uso de AOS (Animate On Scroll) para uma experiência visual mais agradável.
+      Responsividade: Design adaptável para funcionar bem em dispositivos móveis e desktops.
+      Animações:  Uso de AOS (Animate On Scroll) para uma experiência visual mais agradável.
       Integração WhatsApp: Link direto para contato via WhatsApp.
 
  Tecnologias Utilizadas:
