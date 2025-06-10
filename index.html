@@ -448,89 +448,146 @@
         gtag('config', 'UA-XXXXX-Y');
     </script>
     <script defer>
-        AOS.init();
+    AOS.init();
 
-        // Removido: const properties hardcoded
-        let properties = []; // Os imóveis serão carregados do backend
+    let properties = [];
+    let isAdminLoggedIn = false;
+    let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
 
-        // Removido: const adminCredentials hardcoded
-        
-        let isAdminLoggedIn = false; // Estado de login inicializado como falso, será verificado pelo backend
+    const API_URL = 'api.php';
 
-        let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    const propertyList = document.getElementById('propertyList');
+    const loginModal = document.getElementById('loginModal');
+    const adminLoginBtn = document.getElementById('adminLoginBtn');
+    const closeLoginModal = document.getElementById('closeLoginModal');
+    const loginForm = document.getElementById('loginForm');
+    const adminPanel = document.getElementById('adminPanel');
+    const closeAdminPanel = document.getElementById('closeAdminPanel');
+    const addPropertyForm = document.getElementById('addPropertyForm');
+    const adminPropertiesList = document.getElementById('adminPropertiesList');
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const backToTopBtn = document.getElementById('backToTop');
+    const contactForm = document.getElementById('contactForm');
+    const propertyModal = document.getElementById('propertyModal');
+    const closePropertyModal = document.getElementById('closePropertyModal');
+    const propertyFilter = document.getElementById('propertyFilter');
+    const propertySearch = document.getElementById('propertySearch');
+    const minPrice = document.getElementById('minPrice');
+    const maxPrice = document.getElementById('maxPrice');
+    const adminLogoutBtn = document.getElementById('adminLogoutBtn');
 
-        const API_URL = 'api.php'; // URL para o seu backend PHP
+    async function displayProperties(filters = { type: 'all', search: '', minPrice: 0, maxPrice: Infinity }) {
+        try {
+            const response = await fetch(`${API_URL}?action=get_properties`);
+            const data = await response.json();
+            properties = Array.isArray(data) ? data : [];
+        } catch (error) {
+            console.error("Erro ao carregar imóveis do backend:", error);
+            propertyList.innerHTML = '<p class="text-center text-red-600 col-span-full">Erro ao carregar imóveis. Tente novamente mais tarde.</p>';
+            return;
+        }
 
-        const propertyList = document.getElementById('propertyList');
-        const loginModal = document.getElementById('loginModal');
-        const adminLoginBtn = document.getElementById('adminLoginBtn');
-        const closeLoginModal = document.getElementById('closeLoginModal');
-        const loginForm = document.getElementById('loginForm');
-        const adminPanel = document.getElementById('adminPanel');
-        const closeAdminPanel = document.getElementById('closeAdminPanel');
-        const addPropertyForm = document.getElementById('addPropertyForm');
-        const adminPropertiesList = document.getElementById('adminPropertiesList');
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const mobileMenu = document.getElementById('mobileMenu');
-        const backToTopBtn = document.getElementById('backToTop');
-        const contactForm = document.getElementById('contactForm');
-        const propertyModal = document.getElementById('propertyModal');
-        const closePropertyModal = document.getElementById('closePropertyModal');
-        const propertyFilter = document.getElementById('propertyFilter');
-        const propertySearch = document.getElementById('propertySearch');
-        const minPrice = document.getElementById('minPrice');
-        const maxPrice = document.getElementById('maxPrice');
-        const adminLogoutBtn = document.getElementById('adminLogoutBtn'); // Novo botão de logout
+        propertyList.innerHTML = '';
+        const filteredProperties = properties.filter(p => 
+            (filters.type === 'all' || p.type === filters.type) &&
+            parseFloat(p.price) >= filters.minPrice && 
+            parseFloat(p.price) <= filters.maxPrice && 
+            (p.title.toLowerCase().includes(filters.search.toLowerCase()) ||
+             p.neighborhood.toLowerCase().includes(filters.search.toLowerCase()) ||
+             p.description.toLowerCase().includes(filters.search.toLowerCase()))
+        );
 
-        /**
-         * Displays properties based on filter criteria
-         * @param {Object} filters - Filter criteria (type, search, minPrice, maxPrice)
-         */
-        async function displayProperties(filters = { type: 'all', search: '', minPrice: 0, maxPrice: Infinity }) {
-            // Carrega os imóveis do backend se ainda não foram carregados ou se for preciso recarregar
-            // A condição de carregamento é simplificada aqui para sempre buscar, mas pode ser otimizada
-            try {
-                const response = await fetch(`${API_URL}?action=get_properties`);
-                const data = await response.json();
-                properties = Array.isArray(data) ? data : []; // Garante que properties é um array
-            } catch (error) {
-                console.error("Erro ao carregar imóveis do backend:", error);
-                propertyList.innerHTML = '<p class="text-center text-red-600 col-span-full">Erro ao carregar imóveis. Tente novamente mais tarde.</p>';
-                return;
-            }
+        if (filteredProperties.length === 0) {
+            propertyList.innerHTML = '<p class="text-center text-gray-600 col-span-full">Nenhum imóvel encontrado.</p>';
+            return;
+        }
 
-            propertyList.innerHTML = '';
-            const filteredProperties = properties.filter(p => 
-                (filters.type === 'all' || p.type === filters.type) &&
-                parseFloat(p.price) >= filters.minPrice && 
-                parseFloat(p.price) <= filters.maxPrice && 
-                (p.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-                 p.neighborhood.toLowerCase().includes(filters.search.toLowerCase()) ||
-                 p.description.toLowerCase().includes(filters.search.toLowerCase()))
-            );
+        filteredProperties.forEach(property => {
+            const propertyCard = document.createElement('article');
+            propertyCard.className = 'property-card bg-white rounded-lg overflow-hidden shadow-md transition duration-300';
+            const imageUrls = typeof property.images === 'string' ? property.images.split(',').map(url => url.trim()) : property.images;
+            const displayImages = imageUrls.length > 0 ? imageUrls : ['https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'];
 
-            if (filteredProperties.length === 0) {
-                propertyList.innerHTML = '<p class="text-center text-gray-600 col-span-full">Nenhum imóvel encontrado.</p>';
-                return;
-            }
+            propertyCard.innerHTML = `
+                <div class="swiper">
+                    <div class="swiper-wrapper">
+                        ${displayImages.map(img => `
+                            <div class="swiper-slide">
+                                <picture>
+                                    <source srcset="${img}&type=webp" type="image/webp">
+                                    <img src="${img}" alt="${property.title}" class="w-full h-48 object-cover" loading="lazy">
+                                </picture>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-semibold text-gray-800">${property.title}</h3>
+                        <div class="flex items-center space-x-2">
+                            <span class="bg-blue-100 text-brand-blue text-xs px-2 py-1 rounded">${property.type.charAt(0).toUpperCase() + property.type.slice(1)}</span>
+                            <button class="favorite-btn" data-id="${property.id}" aria-label="${favorites.includes(property.id) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}">
+                                <i class="fas fa-heart ${favorites.includes(property.id) ? 'text-red-600' : 'text-gray-400'}"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex items-center text-gray-600 mb-2">
+                        <i class="fas fa-map-marker-alt text-sm mr-1"></i>
+                        <span class="text-sm">${property.neighborhood}, Piedade - SP</span>
+                    </div>
+                    <div class="flex flex-wrap gap-y-2 gap-x-4 text-sm mb-3">
+                        <div class="flex items-center text-gray-600">
+                            <i class="fas fa-ruler-combined mr-1"></i>
+                            <span>${property.area}m²</span>
+                        </div>
+                        ${property.bedrooms > 0 ? `
+                        <div class="flex items-center text-gray-600">
+                            <i class="fas fa-bed mr-1"></i>
+                            <span>${property.bedrooms} quarto${property.bedrooms > 1 ? 's' : ''}</span>
+                        </div>` : ''}
+                        ${property.bathrooms > 0 ? `
+                        <div class="flex items-center text-gray-600">
+                            <i class="fas fa-bath mr-1"></i>
+                            <span>${property.bathrooms} banheiro${property.bathrooms > 1 ? 's' : ''}</span>
+                        </div>` : ''}
+                    </div>
+                    <div class="flex items-center justify-between mt-4">
+                        <span class="text-xl font-bold text-brand-blue">R$ ${parseFloat(property.price).toLocaleString('pt-BR')}</span>
+                        <div class="space-x-2">
+                            <button class="details-btn bg-brand-blue text-white px-4 py-2 rounded hover:bg-blue-700 transition" data-id="${property.id}">Detalhes</button>
+                            <a href="#contato" class="bg-brand-green text-white px-4 py-2 rounded hover:bg-green-700 transition">Agendar Visita</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            propertyList.appendChild(propertyCard);
+            new Swiper(propertyCard.querySelector('.swiper'), {
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev'
+                },
+                loop: true
+            });
+        });
 
-            filteredProperties.forEach(property => {
-                const propertyCard = document.createElement('article');
-                propertyCard.className = 'property-card bg-white rounded-lg overflow-hidden shadow-md transition duration-300';
-                
-                // Trata as imagens, que agora vêm como uma string separada por vírgulas
-                const imageUrls = typeof property.images === 'string' ? property.images.split(',').map(url => url.trim()) : property.images;
-                const displayImages = imageUrls.length > 0 ? imageUrls : ['https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'];
+        document.querySelectorAll('.details-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const property = properties.find(p => p.id === parseInt(btn.dataset.id));
+                if (!property) return;
+                const imageUrlsModal = typeof property.images === 'string' ? property.images.split(',').map(url => url.trim()) : property.images;
+                const displayImagesModal = imageUrlsModal.length > 0 ? imageUrlsModal : ['https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'];
 
-
-                propertyCard.innerHTML = `
+                document.getElementById('modalContent').innerHTML = `
                     <div class="swiper">
                         <div class="swiper-wrapper">
-                            ${displayImages.map(img => `
+                            ${displayImagesModal.map(img => `
                                 <div class="swiper-slide">
                                     <picture>
                                         <source srcset="${img}&type=webp" type="image/webp">
-                                        <img src="${img}" alt="${property.title}" class="w-full h-48 object-cover" loading="lazy">
+                                        <img src="${img}" alt="${property.title}" class="w-full h-64 object-cover rounded" loading="lazy">
                                     </picture>
                                 </div>
                             `).join('')}
@@ -538,47 +595,18 @@
                         <div class="swiper-button-next"></div>
                         <div class="swiper-button-prev"></div>
                     </div>
-                    <div class="p-4">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-lg font-semibold text-gray-800">${property.title}</h3>
-                            <div class="flex items-center space-x-2">
-                                <span class="bg-blue-100 text-brand-blue text-xs px-2 py-1 rounded">${property.type.charAt(0).toUpperCase() + property.type.slice(1)}</span>
-                                <button class="favorite-btn" data-id="${property.id}" aria-label="${favorites.includes(property.id) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}">
-                                    <i class="fas fa-heart ${favorites.includes(property.id) ? 'text-red-600' : 'text-gray-400'}"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="flex items-center text-gray-600 mb-2">
-                            <i class="fas fa-map-marker-alt text-sm mr-1"></i>
-                            <span class="text-sm">${property.neighborhood}, Piedade - SP</span>
-                        </div>
-                        <div class="flex flex-wrap gap-y-2 gap-x-4 text-sm mb-3">
-                            <div class="flex items-center text-gray-600">
-                                <i class="fas fa-ruler-combined mr-1"></i>
-                                <span>${property.area}m²</span>
-                            </div>
-                            ${property.bedrooms > 0 ? `
-                            <div class="flex items-center text-gray-600">
-                                <i class="fas fa-bed mr-1"></i>
-                                <span>${property.bedrooms} quarto${property.bedrooms > 1 ? 's' : ''}</span>
-                            </div>` : ''}
-                            ${property.bathrooms > 0 ? `
-                            <div class="flex items-center text-gray-600">
-                                <i class="fas fa-bath mr-1"></i>
-                                <span>${property.bathrooms} banheiro${property.bathrooms > 1 ? 's' : ''}</span>
-                            </div>` : ''}
-                        </div>
-                        <div class="flex items-center justify-between mt-4">
-                            <span class="text-xl font-bold text-brand-blue">R$ ${parseFloat(property.price).toLocaleString('pt-BR')}</span>
-                            <div class="space-x-2">
-                                <button class="details-btn bg-brand-blue text-white px-4 py-2 rounded hover:bg-blue-700 transition" data-id="${property.id}">Detalhes</button>
-                                <a href="#contato" class="bg-brand-green text-white px-4 py-2 rounded hover:bg-green-700 transition">Agendar Visita</a>
-                            </div>
-                        </div>
-                    </div>
+                    <h3 id="modalTitle" class="text-2xl font-bold mt-4">${property.title}</h3>
+                    <p class="text-gray-600 mt-2">${property.description}</p>
+                    <p class="text-xl font-bold text-brand-blue mt-2">R$ ${parseFloat(property.price).toLocaleString('pt-BR')}</p>
+                    <p class="text-gray-600 mt-2"><strong>Bairro:</strong> ${property.neighborhood}</p>
+                    <p class="text-gray-600"><strong>Área:</strong> ${property.area}m²</p>
+                    ${property.bedrooms > 0 ? `<p class="text-gray-600"><strong>Quartos:</strong> ${property.bedrooms}</p>` : ''}
+                    ${property.bathrooms > 0 ? `<p class="text-gray-600"><strong>Banheiros:</strong> ${property.bathrooms}</p>` : ''}
+                    <a href="#contato" class="bg-brand-green text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition inline-block mt-4">Agendar Visita</a>
                 `;
-                propertyList.appendChild(propertyCard);
-                new Swiper(propertyCard.querySelector('.swiper'), {
+                propertyModal.classList.remove('hidden');
+                propertyModal.setAttribute('aria-hidden', 'false');
+                new Swiper(document.querySelector('#modalContent .swiper'), {
                     navigation: {
                         nextEl: '.swiper-button-next',
                         prevEl: '.swiper-button-prev'
@@ -586,466 +614,402 @@
                     loop: true
                 });
             });
+        });
 
-            document.querySelectorAll('.details-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const property = properties.find(p => p.id === parseInt(btn.dataset.id));
-                    if (!property) return; // Garante que a propriedade existe
-                    const imageUrlsModal = typeof property.images === 'string' ? property.images.split(',').map(url => url.trim()) : property.images;
-                    const displayImagesModal = imageUrlsModal.length > 0 ? imageUrlsModal : ['https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'];
+        document.querySelectorAll('.favorite-btn').forEach(btn => {
+            btn.addEventListener('click', () => toggleFavorite(parseInt(btn.dataset.id)));
+        });
+    }
 
-                    document.getElementById('modalContent').innerHTML = `
-                        <div class="swiper">
-                            <div class="swiper-wrapper">
-                                ${displayImagesModal.map(img => `
-                                    <div class="swiper-slide">
-                                        <picture>
-                                            <source srcset="${img}&type=webp" type="image/webp">
-                                            <img src="${img}" alt="${property.title}" class="w-full h-64 object-cover rounded" loading="lazy">
-                                        </picture>
-                                    </div>
-                                `).join('')}
-                            </div>
-                            <div class="swiper-button-next"></div>
-                            <div class="swiper-button-prev"></div>
-                        </div>
-                        <h3 id="modalTitle" class="text-2xl font-bold mt-4">${property.title}</h3>
-                        <p class="text-gray-600 mt-2">${property.description}</p>
-                        <p class="text-xl font-bold text-brand-blue mt-2">R$ ${parseFloat(property.price).toLocaleString('pt-BR')}</p>
-                        <p class="text-gray-600 mt-2"><strong>Bairro:</strong> ${property.neighborhood}</p>
-                        <p class="text-gray-600"><strong>Área:</strong> ${property.area}m²</p>
-                        ${property.bedrooms > 0 ? `<p class="text-gray-600"><strong>Quartos:</strong> ${property.bedrooms}</p>` : ''}
-                        ${property.bathrooms > 0 ? `<p class="text-gray-600"><strong>Banheiros:</strong> ${property.bathrooms}</p>` : ''}
-                        <a href="#contato" class="bg-brand-green text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition inline-block mt-4">Agendar Visita</a>
-                    `;
-                    propertyModal.classList.remove('hidden');
-                    propertyModal.setAttribute('aria-hidden', 'false');
-                    new Swiper(document.querySelector('#modalContent .swiper'), {
-                        navigation: {
-                            nextEl: '.swiper-button-next',
-                            prevEl: '.swiper-button-prev'
-                        },
-                        loop: true
-                    });
-                });
-            });
-
-            document.querySelectorAll('.favorite-btn').forEach(btn => {
-                btn.addEventListener('click', () => toggleFavorite(parseInt(btn.dataset.id)));
-            });
-        }
-
-        /**
-         * Displays properties in admin panel
-         */
-        function displayAdminProperties() {
-            adminPropertiesList.innerHTML = '';
-            // A lista de `properties` já foi carregada pela `displayProperties`
-            properties.forEach(property => {
-                const propertyItem = document.createElement('div');
-                propertyItem.className = 'bg-gray-100 p-3 rounded-lg';
-                propertyItem.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h4 class="font-medium">${property.title}</h4>
-                            <p class="text-sm text-gray-600">${property.neighborhood} • ${property.type.charAt(0).toUpperCase() + property.type.slice(1)}</p>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button class="edit-property text-brand-blue hover:text-blue-800" data-id="${property.id}" aria-label="Editar imóvel"><i class="fas fa-edit"></i></button>
-                            <button class="delete-property text-red-600 hover:text-red-800" data-id="${property.id}" aria-label="Excluir imóvel"><i class="fas fa-trash-alt"></i></button>
-                        </div>
+    function displayAdminProperties() {
+        adminPropertiesList.innerHTML = '';
+        properties.forEach(property => {
+            const propertyItem = document.createElement('div');
+            propertyItem.className = 'bg-gray-100 p-3 rounded-lg';
+            propertyItem.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h4 class="font-medium">${property.title}</h4>
+                        <p class="text-sm text-gray-600">${property.neighborhood} • ${property.type.charAt(0).toUpperCase() + property.type.slice(1)}</p>
                     </div>
-                    <div class="mt-2 flex justify-between text-sm">
-                        <span>R$ ${parseFloat(property.price).toLocaleString('pt-BR')}</span>
-                        <span>${property.area}m²</span>
-                        <span>${property.bedrooms}Q ${property.bathrooms}B</span>
+                    <div class="flex space-x-2">
+                        <button class="edit-property text-brand-blue hover:text-blue-800" data-id="${property.id}" aria-label="Editar imóvel"><i class="fas fa-edit"></i></button>
+                        <button class="delete-property text-red-600 hover:text-red-800" data-id="${property.id}" aria-label="Excluir imóvel"><i class="fas fa-trash-alt"></i></button>
                     </div>
-                `;
-                adminPropertiesList.appendChild(propertyItem);
-            });
+                </div>
+                <div class="mt-2 flex justify-between text-sm">
+                    <span>R$ ${parseFloat(property.price).toLocaleString('pt-BR')}</span>
+                    <span>${property.area}m²</span>
+                    <span>${property.bedrooms}Q ${property.bathrooms}B</span>
+                </div>
+            `;
+            adminPropertiesList.appendChild(propertyItem);
+        });
 
-            document.querySelectorAll('.edit-property').forEach(btn => {
-                btn.addEventListener('click', (e) => editProperty(parseInt(e.currentTarget.dataset.id)));
-            });
+        document.querySelectorAll('.edit-property').forEach(btn => {
+            btn.addEventListener('click', (e) => editProperty(parseInt(e.currentTarget.dataset.id)));
+        });
 
-            document.querySelectorAll('.delete-property').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    if (confirm('Tem certeza que deseja excluir este imóvel?')) {
-                        deleteProperty(parseInt(e.currentTarget.dataset.id));
-                    }
-                });
-            });
-        }
-
-        /**
-         * Adds a new property
-         * @param {Event} e - Form submission event
-         */
-        async function addProperty(e) {
-            e.preventDefault();
-            const price = parseFloat(document.getElementById('propertyPrice').value);
-            const area = parseInt(document.getElementById('propertyArea').value);
-            if (price <= 0 || area <= 0) {
-                alert('Preço e área devem ser maiores que zero.');
-                return;
-            }
-            const images = document.getElementById('propertyImages').value.split(',').map(img => img.trim()).filter(img => img);
-            const newProperty = {
-                title: document.getElementById('propertyTitle').value,
-                description: document.getElementById('propertyDescription').value,
-                price: price,
-                type: document.getElementById('propertyType').value,
-                neighborhood: document.getElementById('propertyNeighborhood').value,
-                area: area,
-                bedrooms: parseInt(document.getElementById('propertyBedrooms').value) || 0,
-                bathrooms: parseInt(document.getElementById('propertyBathrooms').value) || 0,
-                images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80']
-            };
-
-            try {
-                const response = await fetch(`${API_URL}?action=add_property`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(newProperty)
-                });
-                const result = await response.json();
-
-                if (result.success) {
-                    properties = []; // Limpa a lista local para forçar o recarregamento do backend
-                    addPropertyForm.reset();
-                    displayProperties(getCurrentFilters());
-                    displayAdminProperties();
-                    alert('Imóvel adicionado com sucesso!');
-                } else {
-                    alert(result.message || 'Erro ao adicionar imóvel.');
+        document.querySelectorAll('.delete-property').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (confirm('Tem certeza que deseja excluir este imóvel?')) {
+                    deleteProperty(parseInt(e.currentTarget.dataset.id));
                 }
-            } catch (error) {
-                console.error("Erro na requisição para adicionar imóvel:", error);
-                alert('Erro ao tentar adicionar imóvel.');
-            }
+            });
+        });
+    }
+
+    async function addProperty(e) {
+        e.preventDefault();
+        const price = parseFloat(document.getElementById('propertyPrice').value);
+        const area = parseInt(document.getElementById('propertyArea').value);
+        if (price <= 0 || area <= 0) {
+            alert('Preço e área devem ser maiores que zero.');
+            return;
         }
+        const images = document.getElementById('propertyImages').value.split(',').map(img => img.trim()).filter(img => img);
+        const newProperty = {
+            title: document.getElementById('propertyTitle').value,
+            description: document.getElementById('propertyDescription').value,
+            price: price,
+            type: document.getElementById('propertyType').value,
+            neighborhood: document.getElementById('propertyNeighborhood').value,
+            area: area,
+            bedrooms: parseInt(document.getElementById('propertyBedrooms').value) || 0,
+            bathrooms: parseInt(document.getElementById('propertyBathrooms').value) || 0,
+            images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80']
+        };
 
-        /**
-         * Edits an existing property
-         * @param {number} id - Property ID
-         */
-        function editProperty(id) {
-            const property = properties.find(p => p.id === id);
-            if (!property) return;
-            document.getElementById('propertyTitle').value = property.title;
-            document.getElementById('propertyDescription').value = property.description;
-            document.getElementById('propertyPrice').value = property.price;
-            document.getElementById('propertyType').value = property.type;
-            document.getElementById('propertyNeighborhood').value = property.neighborhood;
-            document.getElementById('propertyArea').value = property.area;
-            document.getElementById('propertyBedrooms').value = property.bedrooms;
-            document.getElementById('propertyBathrooms').value = property.bathrooms;
-            document.getElementById('propertyImages').value = typeof property.images === 'string' ? property.images : property.images.join(', '); // Garante string
-            addPropertyForm.removeEventListener('submit', addProperty);
-            addPropertyForm.addEventListener('submit', (e) => updateProperty(e, id));
-            addPropertyForm.querySelector('button[type="submit"]').textContent = 'Atualizar Imóvel';
-        }
+        try {
+            const response = await fetch(`${API_URL}?action=add_property`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newProperty)
+            });
+            const result = await response.json();
 
-        /**
-         * Updates an existing property
-         * @param {Event} e - Form submission event
-         * @param {number} id - Property ID
-         */
-        async function updateProperty(e, id) {
-            e.preventDefault();
-            const price = parseFloat(document.getElementById('propertyPrice').value);
-            const area = parseInt(document.getElementById('propertyArea').value);
-            if (price <= 0 || area <= 0) {
-                alert('Preço e área devem ser maiores que zero.');
-                return;
-            }
-            const images = document.getElementById('propertyImages').value.split(',').map(img => img.trim()).filter(img => img);
-            const updatedProperty = {
-                id: id,
-                title: document.getElementById('propertyTitle').value,
-                description: document.getElementById('propertyDescription').value,
-                price: price,
-                type: document.getElementById('propertyType').value,
-                neighborhood: document.getElementById('propertyNeighborhood').value,
-                area: area,
-                bedrooms: parseInt(document.getElementById('propertyBedrooms').value) || 0,
-                bathrooms: parseInt(document.getElementById('propertyBathrooms').value) || 0,
-                images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80']
-            };
-
-            try {
-                const response = await fetch(`${API_URL}?action=update_property`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(updatedProperty)
-                });
-                const result = await response.json();
-
-                if (result.success) {
-                    properties = []; // Limpa a lista local para forçar o recarregamento
-                    addPropertyForm.reset();
-                    addPropertyForm.removeEventListener('submit', updateProperty);
-                    addPropertyForm.addEventListener('submit', addProperty);
-                    addPropertyForm.querySelector('button[type="submit"]').textContent = 'Adicionar Imóvel';
-                    displayProperties(getCurrentFilters());
-                    displayAdminProperties();
-                    alert('Imóvel atualizado com sucesso!');
-                } else {
-                    alert(result.message || 'Erro ao atualizar imóvel.');
-                }
-            } catch (error) {
-                console.error("Erro na requisição para atualizar imóvel:", error);
-                alert('Erro ao tentar atualizar imóvel.');
-            }
-        }
-
-        /**
-         * Deletes a property
-         * @param {number} id - Property ID
-         */
-        async function deleteProperty(id) {
-            if (!confirm('Tem certeza que deseja excluir este imóvel?')) {
-                return;
-            }
-            try {
-                const response = await fetch(`${API_URL}?action=delete_property`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ id }) // Envia o ID do imóvel a ser deletado
-                });
-                const result = await response.json();
-
-                if (result.success) {
-                    properties = []; // Limpa a lista local para forçar o recarregamento
-                    displayProperties(getCurrentFilters());
-                    displayAdminProperties();
-                    alert('Imóvel excluído com sucesso!');
-                } else {
-                    alert(result.message || 'Erro ao excluir imóvel.');
-                }
-            } catch (error) {
-                console.error("Erro na requisição para excluir imóvel:", error);
-                alert('Erro ao tentar excluir imóvel.');
-            }
-        }
-
-        /**
-         * Toggles favorite status for a property
-         * NOTE: This is purely client-side with localStorage.
-         * To make it persistent, you'd need another backend endpoint.
-         * @param {number} id - Property ID
-         */
-        function toggleFavorite(id) {
-            if (favorites.includes(id)) {
-                favorites = favorites.filter(f => f !== id);
+            if (result.success) {
+                properties = [];
+                addPropertyForm.reset();
+                displayProperties(getCurrentFilters());
+                displayAdminProperties();
+                alert('Imóvel adicionado com sucesso!');
             } else {
-                favorites.push(id);
+                alert(result.message || 'Erro ao adicionar imóvel.');
             }
-            localStorage.setItem('favorites', JSON.stringify(favorites));
-            displayProperties(getCurrentFilters());
+        } catch (error) {
+            console.error("Erro na requisição para adicionar imóvel:", error);
+            alert('Erro ao tentar adicionar imóvel.');
         }
+    }
 
-        /**
-         * Gets current filter values
-         * @returns {Object} Current filter values
-         */
-        function getCurrentFilters() {
-            return {
-                type: propertyFilter.value,
-                search: propertySearch.value,
-                minPrice: parseFloat(minPrice.value) || 0,
-                maxPrice: parseFloat(maxPrice.value) || Infinity
-            };
+    function editProperty(id) {
+        const property = properties.find(p => p.id === id);
+        if (!property) return;
+        document.getElementById('propertyTitle').value = property.title;
+        document.getElementById('propertyDescription').value = property.description;
+        document.getElementById('propertyPrice').value = property.price;
+        document.getElementById('propertyType').value = property.type;
+        document.getElementById('propertyNeighborhood').value = property.neighborhood;
+        document.getElementById('propertyArea').value = property.area;
+        document.getElementById('propertyBedrooms').value = property.bedrooms;
+        document.getElementById('propertyBathrooms').value = property.bathrooms;
+        document.getElementById('propertyImages').value = typeof property.images === 'string' ? property.images : property.images.join(', ');
+        addPropertyForm.removeEventListener('submit', addProperty);
+        addPropertyForm.addEventListener('submit', (e) => updateProperty(e, id));
+        addPropertyForm.querySelector('button[type="submit"]').textContent = 'Atualizar Imóvel';
+    }
+
+    async function updateProperty(e, id) {
+        e.preventDefault();
+        const price = parseFloat(document.getElementById('propertyPrice').value);
+        const area = parseInt(document.getElementById('propertyArea').value);
+        if (price <= 0 || area <= 0) {
+            alert('Preço e área devem ser maiores que zero.');
+            return;
         }
+        const images = document.getElementById('propertyImages').value.split(',').map(img => img.trim()).filter(img => img);
+        const updatedProperty = {
+            id: id,
+            title: document.getElementById('propertyTitle').value,
+            description: document.getElementById('propertyDescription').value,
+            price: price,
+            type: document.getElementById('propertyType').value,
+            neighborhood: document.getElementById('propertyNeighborhood').value,
+            area: area,
+            bedrooms: parseInt(document.getElementById('propertyBedrooms').value) || 0,
+            bathrooms: parseInt(document.getElementById('propertyBathrooms').value) || 0,
+            images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80']
+        };
 
-        /**
-         * Handles login
-         * @param {Event} e - Form submission event
-         */
-        async function handleLogin(e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+        try {
+            const response = await fetch(`${API_URL}?action=update_property`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedProperty)
+            });
+            const result = await response.json();
 
-            try {
-                const response = await fetch(`${API_URL}?action=login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, password })
-                });
-                const result = await response.json();
-
-                if (result.success) {
-                    isAdminLoggedIn = true;
-                    localStorage.setItem('isAdminLoggedIn', 'true'); // Armazena estado no navegador
-                    loginModal.classList.add('hidden');
-                    loginModal.setAttribute('aria-hidden', 'true');
-                    adminPanel.classList.remove('translate-x-full');
-                    alert('Login realizado com sucesso!');
-                    displayAdminProperties(); // Atualiza painel admin com dados do backend
-                } else {
-                    alert(result.message || 'Usuário ou senha incorretos!');
-                }
-            } catch (error) {
-                console.error("Erro na requisição de login:", error);
-                alert('Erro ao tentar logar. Tente novamente.');
+            if (result.success) {
+                properties = [];
+                addPropertyForm.reset();
+                addPropertyForm.removeEventListener('submit', updateProperty);
+                addPropertyForm.addEventListener('submit', addProperty);
+                addPropertyForm.querySelector('button[type="submit"]').textContent = 'Adicionar Imóvel';
+                displayProperties(getCurrentFilters());
+                displayAdminProperties();
+                alert('Imóvel atualizado com sucesso!');
+            } else {
+                alert(result.message || 'Erro ao atualizar imóvel.');
             }
+        } catch (error) {
+            console.error("Erro na requisição para atualizar imóvel:", error);
+            alert('Erro ao tentar atualizar imóvel.');
         }
+    }
 
-        /**
-         * Toggles mobile menu
-         */
-        function toggleMobileMenu() {
-            mobileMenu.classList.toggle('hidden');
+    async function deleteProperty(id) {
+        if (!confirm('Tem certeza que deseja excluir este imóvel?')) {
+            return;
         }
+        try {
+            const response = await fetch(`${API_URL}?action=delete_property`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id })
+            });
+            const result = await response.json();
 
-        /**
-         * Handles contact form submission
-         * @param {Event} e - Form submission event
-         */
-        async function handleContactSubmit(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                alert('Por favor, insira um e-mail válido.');
-                return;
+            if (result.success) {
+                properties = [];
+                displayProperties(getCurrentFilters());
+                displayAdminProperties();
+                alert('Imóvel excluído com sucesso!');
+            } else {
+                alert(result.message || 'Erro ao excluir imóvel.');
             }
-            const name = document.getElementById('name').value;
-            const phone = document.getElementById('phone').value;
-            const message = document.getElementById('message').value;
-
-            try {
-                const response = await fetch(`${API_URL}?action=send_contact`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ name, email, phone, message })
-                });
-                const result = await response.json();
-
-                if (result.success) {
-                    alert(`Obrigado, ${name}! Sua mensagem foi enviada com sucesso. Entraremos em contato em breve.`);
-                    contactForm.reset();
-                } else {
-                    alert(result.message || 'Erro ao enviar mensagem. Tente novamente.');
-                }
-            } catch (error) {
-                console.error("Erro na requisição de contato:", error);
-                alert('Erro ao tentar enviar mensagem. Tente novamente.');
-            }
+        } catch (error) {
+            console.error("Erro na requisição para excluir imóvel:", error);
+            alert('Erro ao tentar excluir imóvel.');
         }
+    }
 
-        /**
-         * Updates active navigation link based on scroll position
-         */
-        function updateActiveNav() {
-            const sections = document.querySelectorAll('section');
-            const navLinks = document.querySelectorAll('nav a');
-            let current = '';
-            sections.forEach(section => {
-                if (window.pageYOffset >= section.offsetTop - 60) {
-                    current = section.getAttribute('id');
+    function toggleFavorite(id) {
+        if (favorites.includes(id)) {
+            favorites = favorites.filter(f => f !== id);
+        } else {
+            favorites.push(id);
+        }
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+        displayProperties(getCurrentFilters());
+    }
+
+    function getCurrentFilters() {
+        return {
+            type: propertyFilter.value,
+            search: propertySearch.value,
+            minPrice: parseFloat(minPrice.value) || 0,
+            maxPrice: parseFloat(maxPrice.value) || Infinity
+        };
+    }
+
+    async function handleLogin(e) {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            const response = await fetch(`${API_URL}?action=login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                isAdminLoggedIn = true;
+                localStorage.setItem('isAdminLoggedIn', 'true');
+                loginModal.classList.add('hidden');
+                loginModal.setAttribute('aria-hidden', 'true');
+                adminPanel.classList.remove('translate-x-full');
+                alert('Login realizado com sucesso!');
+                displayAdminProperties();
+            } else {
+                alert(result.message || 'Usuário ou senha incorretos!');
+            }
+        } catch (error) {
+            console.error("Erro na requisição de login:", error);
+            alert('Erro ao tentar logar. Tente novamente.');
+        }
+    }
+
+    async function handleLogout() {
+        try {
+            const response = await fetch(`${API_URL}?action=logout`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
                 }
             });
-            navLinks.forEach(link => {
-                link.classList.toggle('active', link.getAttribute('href') === `#${current}`);
-            });
-        }
+            const result = await response.json();
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            document.getElementById('footerYear').textContent = `© ${new Date().getFullYear()} Oto Imóveis. Todos os direitos reservados.`;
-
-            // Verifica o status de login no backend ao carregar a página
-            try {
-                const checkLoginResponse = await fetch(`${API_URL}?action=check_login`);
-                const loginStatus = await checkLoginResponse.json();
-                isAdminLoggedIn = loginStatus.isLoggedIn;
-                localStorage.setItem('isAdminLoggedIn', isAdminLoggedIn); // Sincroniza com localStorage
-            } catch (error) {
-                console.error("Erro ao verificar status de login:", error);
+            if (result.success) {
                 isAdminLoggedIn = false;
                 localStorage.removeItem('isAdminLoggedIn');
-            }
-
-            displayProperties(); // Exibe os imóveis carregados do backend
-
-            if (isAdminLoggedIn) {
-                displayAdminProperties(); // Só exibe o painel admin se logado
-                adminPanel.classList.remove('translate-x-full');
-            }
-        });
-
-        adminLoginBtn.addEventListener('click', () => {
-            if (isAdminLoggedIn) {
-                adminPanel.classList.remove('translate-x-full');
+                adminPanel.classList.add('translate-x-full');
+                alert('Logout realizado com sucesso!');
             } else {
-                loginModal.classList.remove('hidden');
-                loginModal.setAttribute('aria-hidden', 'true');
+                alert(result.message || 'Erro ao realizar logout.');
             }
-        });
+        } catch (error) {
+            console.error("Erro na requisição de logout:", error);
+            alert('Erro ao tentar realizar logout. Tente novamente.');
+        }
+    }
 
-        closeLoginModal.addEventListener('click', () => {
-            loginModal.classList.add('hidden');
-            loginModal.setAttribute('aria-hidden', 'true');
-        });
+    function toggleMobileMenu() {
+        mobileMenu.classList.toggle('hidden');
+    }
 
-        loginForm.addEventListener('submit', handleLogin);
+    async function handleContactSubmit(e) {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            alert('Por favor, insira um e-mail válido.');
+            return;
+        }
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
+        const message = document.getElementById('message').value;
 
-        closeAdminPanel.addEventListener('click', () => {
-            adminPanel.classList.add('translate-x-full');
-        });
-
-        adminLogoutBtn.addEventListener('click', handleLogout); // Evento para o botão de logout
-
-        addPropertyForm.addEventListener('submit', addProperty);
-
-        closePropertyModal.addEventListener('click', () => {
-            propertyModal.classList.add('hidden');
-            propertyModal.setAttribute('aria-hidden', 'true');
-        });
-
-        [propertyFilter, propertySearch, minPrice, maxPrice].forEach(input => {
-            input.addEventListener('change', () => displayProperties(getCurrentFilters()));
-            input.addEventListener('input', () => displayProperties(getCurrentFilters()));
-        });
-
-        document.querySelectorAll('.filter-link').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const filterType = e.currentTarget.dataset.type;
-                propertyFilter.value = filterType;
-                displayProperties(getCurrentFilters());
-                document.getElementById('imoveis').scrollIntoView({ behavior: 'smooth' });
+        try {
+            const response = await fetch(`${API_URL}?action=send_contact`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, email, phone, message })
             });
-        });
+            const result = await response.json();
 
-        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
-
-        backToTopBtn.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-
-        window.addEventListener('scroll', () => {
-            if (window.pageYOffset > 300) {
-                backToTopBtn.classList.remove('opacity-0', 'invisible');
-                backToTopBtn.classList.add('opacity-100', 'visible');
+            if (result.success) {
+                alert(`Obrigado, ${name}! Sua mensagem foi enviada com sucesso. Entraremos em contato em breve.`);
+                contactForm.reset();
             } else {
-                backToTopBtn.classList.remove('opacity-100', 'visible');
-                backToTopBtn.classList.add('opacity-0', 'invisible');
+                alert(result.message || 'Erro ao enviar mensagem. Tente novamente.');
             }
-            updateActiveNav();
-        });
+        } catch (error) {
+            console.error("Erro na requisição de contato:", error);
+            alert('Erro ao tentar enviar mensagem. Tente novamente.');
+        }
+    }
 
-        contactForm.addEventListener('submit', handleContactSubmit);
-    </script>
+    function updateActiveNav() {
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('nav a');
+        let current = '';
+        sections.forEach(section => {
+            if (window.pageYOffset >= section.offsetTop - 60) {
+                current = section.getAttribute('id');
+            }
+        });
+        navLinks.forEach(link => {
+            link.classList.toggle('active', link.getAttribute('href') === `#${current}`);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        document.getElementById('footerYear').textContent = `© ${new Date().getFullYear()} Oto Imóveis. Todos os direitos reservados.`;
+
+        try {
+            const checkLoginResponse = await fetch(`${API_URL}?action=check_login`);
+            const loginStatus = await checkLoginResponse.json();
+            isAdminLoggedIn = loginStatus.isLoggedIn;
+            localStorage.setItem('isAdminLoggedIn', isAdminLoggedIn);
+        } catch (error) {
+            console.error("Erro ao verificar status de login:", error);
+            isAdminLoggedIn = false;
+            localStorage.removeItem('isAdminLoggedIn');
+        }
+
+        displayProperties();
+
+        if (isAdminLoggedIn) {
+            displayAdminProperties();
+            adminPanel.classList.remove('translate-x-full');
+        }
+    });
+
+    adminLoginBtn.addEventListener('click', () => {
+        if (isAdminLoggedIn) {
+            adminPanel.classList.remove('translate-x-full');
+        } else {
+            loginModal.classList.remove('hidden');
+            loginModal.setAttribute('aria-hidden', 'false');
+        }
+    });
+
+    closeLoginModal.addEventListener('click', () => {
+        loginModal.classList.add('hidden');
+        loginModal.setAttribute('aria-hidden', 'true');
+    });
+
+    loginForm.addEventListener('submit', handleLogin);
+
+    closeAdminPanel.addEventListener('click', () => {
+        adminPanel.classList.add('translate-x-full');
+    });
+
+    adminLogoutBtn.addEventListener('click', handleLogout);
+
+    addPropertyForm.addEventListener('submit', addProperty);
+
+    closePropertyModal.addEventListener('click', () => {
+        propertyModal.classList.add('hidden');
+        propertyModal.setAttribute('aria-hidden', 'true');
+    });
+
+    [propertyFilter, propertySearch, minPrice, maxPrice].forEach(input => {
+        input.addEventListener('change', () => displayProperties(getCurrentFilters()));
+        input.addEventListener('input', () => displayProperties(getCurrentFilters()));
+    });
+
+    document.querySelectorAll('.filter-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const filterType = e.currentTarget.dataset.type;
+            propertyFilter.value = filterType;
+            displayProperties(getCurrentFilters());
+            document.getElementById('imoveis').scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+
+    backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 300) {
+            backToTopBtn.classList.remove('opacity-0', 'invisible');
+            backToTopBtn.classList.add('opacity-100', 'visible');
+        } else {
+            backToTopBtn.classList.remove('opacity-100', 'visible');
+            backToTopBtn.classList.add('opacity-0', 'invisible');
+        }
+        updateActiveNav();
+    });
+
+    contactForm.addEventListener('submit', handleContactSubmit);
+</script>
 </body>
 </html>
