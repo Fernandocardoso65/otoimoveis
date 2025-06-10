@@ -27,15 +27,16 @@ Painel Administrativo:
 
    Frontend:
    
-    * HTML5
-    * CSS3 (com framework [Tailwind CSS](https://tailwindcss.com/))
-    * JavaScript (ES6+)
-    * [AOS - Animate On Scroll](https://michalsnik.github.io/aos/) para animações
-    * [Swiper.js](https://swiperjs.com/) para sliders de imagens
-    * [Font Awesome](https://fontawesome.com/) para ícones
+     HTML5
+     CSS3 (com framework [Tailwind CSS](https://tailwindcss.com/))
+     JavaScript (ES6+)
+     [AOS - Animate On Scroll](https://michalsnik.github.io/aos/) para animações
+     [Swiper.js](https://swiperjs.com/) para sliders de imagens
+     [Font Awesome](https://fontawesome.com/) para ícones
 
 
    Backend:
-    * PHP 
-    * MySQL 
+    
+    PHP 
+    MySQL 
 
