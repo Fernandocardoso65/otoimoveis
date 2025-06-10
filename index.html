@@ -60,7 +60,6 @@
             height: 200px;
         }
     </style>
-    <!-- Replace with minified Tailwind CSS file -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -189,6 +188,7 @@
                     <h3 class="font-semibold mb-3">Imóveis Cadastrados</h3>
                     <div id="adminPropertiesList" class="space-y-3"></div>
                 </div>
+                <button id="adminLogoutBtn" class="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition mt-4 w-full">Sair</button>
             </div>
         </div>
 
@@ -234,9 +234,9 @@
                         <option value="apartamento">Apartamentos</option>
                         <option value="terreno">Terrenos</option>
                         <option value="comercial">Comercial</option>
-                        <option value="chacara">Chácaras</option>
-                        <option value="sitio">Sítios</option>
-                        <option value="fazenda">Fazendas</option>
+                        <option value="chacara">Chácara</option>
+                        <option value="sitio">Sítio</option>
+                        <option value="fazenda">Fazenda</option>
                     </select>
                     <input type="number" id="minPrice" placeholder="Preço Mín." class="px-4 py-2 border rounded">
                     <input type="number" id="maxPrice" placeholder="Preço Máx." class="px-4 py-2 border rounded">
@@ -314,14 +314,14 @@
                                     <i class="fas fa-map-marker-alt text-brand-blue mt-1 mr-3"></i>
                                     <div>
                                         <h4 class="font-medium">Endereço</h4>
-                                        <p class="text-gray-600">Rua Coronel Oliveira, 123 - Centro, Piedade - SP</p>
+                                        <p class="text-gray-600">Rua Capitão Moraes, 273, Piedade, SP, Brazil</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start">
                                     <i class="fas fa-phone-alt text-brand-blue mt-1 mr-3"></i>
                                     <div>
-                                        <h4 class="font-medium">Telefone</h4>
-                                        <p class="text-gray-600">(15) 9999-9999</p>
+                                        <h4 class="font-medium">Telefones</h4>
+                                        <p class="text-gray-600">(15) 3344-1314-(15) 99794-0520</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start">
@@ -342,7 +342,7 @@
                             <div class="mt-6">
                                 <h4 class="font-medium mb-3">Nos siga nas redes sociais</h4>
                                 <div class="flex space-x-4">
-                                    <a href="https://wa.me/5515999999999" class="text-brand-green hover:text-green-700">
+                                    <a href="https://wa.me/15997940520" class="text-brand-green hover:text-green-700">
                                         <i class="fab fa-whatsapp text-xl"></i>
                                     </a>
                                     <a href="#" class="text-blue-600 hover:text-blue-800">
@@ -371,7 +371,7 @@
                         <i class="fas fa-home text-2xl mr-2"></i>
                         <h3 class="text-xl font-bold">OTO IMÓVEIS</h3>
                     </div>
-                    <p class="text-gray-400">Sua parceira imobiliária em Piedade e região</p>
+                    <p class="text-gray-400">Sua imobiliária parceira em Piedade e região</p>
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
                     <div>
@@ -398,17 +398,23 @@
                     <div>
                         <h4 class="font-semibold mb-3">Contato</h4>
                         <ul class="space-y-2">
-                            <li class="text-gray-400">Rua Coronel Oliveira, 123</li>
+                            <li class="text-gray-400">Rua Capitão Moraes,273</li>
                             <li class="text-gray-400">Piedade - SP</li>
                             <li class="text-gray-400">contato@otoimoveis.com.br</li>
-                            <li class="text-gray-400">(15) 9999-9999</li>
+                            <li class="text-gray-400">(15) 99794-0520</li>
                         </ul>
                     </div>
                 </div>
             </div>
             <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400">
                 <p id="footerYear"></p>
-                <p class="mt-1 text-sm">Desenvolvido com paixão para Piedade</p>
+                <p id="footerYear"></p>
+<p class="mt-1 text-sm flex items-center justify-center">
+    Desenvolvido por 
+    <a href="https://github.com/Fernandocardoso65" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white transition ml-1">
+        <i class="fab fa-github mr-1"></i> Fernandocardoso65
+    </a>
+</p>
             </div>
         </div>
     </footer>
@@ -426,15 +432,14 @@
         "name": "Oto Imóveis",
         "address": {
             "@type": "PostalAddress",
-            "streetAddress": "Rua Coronel Oliveira, 123",
+            "streetAddress": "Rua Capitão Moraes,273",
             "addressLocality": "Piedade",
             "addressRegion": "SP",
             "postalCode": "18170-000"
         },
-        "telephone": "(15) 9999-9999"
+        "telephone": "(15) 99794-0520"
     }
     </script>
-    <!-- Replace UA-XXXXX-Y with your Google Analytics tracking ID -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-XXXXX-Y"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -445,56 +450,16 @@
     <script defer>
         AOS.init();
 
-        const properties = [
-            {
-                id: 1,
-                title: "Casa com 3 Quartos no Centro",
-                description: "Ótima casa localizada no centro de Piedade, com 3 quartos, 2 banheiros, garagem para 2 carros e quintal espaçoso.",
-                price: 450000,
-                type: "casa",
-                neighborhood: "Centro",
-                area: 180,
-                bedrooms: 3,
-                bathrooms: 2,
-                images: ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
-            },
-            {
-                id: 2,
-                title: "Apartamento Moderno à Venda",
-                description: "Apartamento novo com 2 dormitórios, sala ampla, cozinha americana e área de lazer completa com piscina e churrasqueira.",
-                price: 320000,
-                type: "apartamento",
-                neighborhood: "Jardim São Paulo",
-                area: 85,
-                bedrooms: 2,
-                bathrooms: 2,
-                images: ["https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
-            },
-            {
-                id: 3,
-                title: "Terreno Residencial 300m²",
-                description: "Excelente terreno residencial, plano e sem buracos, com ótima localização próximo ao centro da cidade.",
-                price: 180000,
-                type: "terreno",
-                neighborhood: "Vila São Pedro",
-                area: 300,
-                bedrooms: 0,
-                bathrooms: 0,
-                images: ["https://images.unsplash.com/photo-1600304594525-2a484e6d3ed4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
-            },
-            {
-                id: 4,
-                title: "Sala Comercial Bem Localizada",
-                description: "Sala comercial com excelente fluxo de pessoas, ideal para diversos tipos de negócios. Reformada recentemente.",
-                price: 250000,
-                type: "comercial",
-                neighborhood: "Centro",
-                area: 65,
-                bedrooms: 0,
-                bathrooms: 1,
-                images: ["https://images.unsplash.com/photo-1497366754035-f200968a6e72?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
-            }
-        ];
+        // Removido: const properties hardcoded
+        let properties = []; // Os imóveis serão carregados do backend
+
+        // Removido: const adminCredentials hardcoded
+        
+        let isAdminLoggedIn = false; // Estado de login inicializado como falso, será verificado pelo backend
+
+        let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+
+        const API_URL = 'api.php'; // URL para o seu backend PHP
 
         const propertyList = document.getElementById('propertyList');
         const loginModal = document.getElementById('loginModal');
@@ -515,25 +480,30 @@
         const propertySearch = document.getElementById('propertySearch');
         const minPrice = document.getElementById('minPrice');
         const maxPrice = document.getElementById('maxPrice');
-
-        const adminCredentials = {
-            username: 'admin',
-            password: 'piedade123'
-        };
-
-        let isAdminLoggedIn = localStorage.getItem('isAdminLoggedIn') === 'true';
-        let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+        const adminLogoutBtn = document.getElementById('adminLogoutBtn'); // Novo botão de logout
 
         /**
          * Displays properties based on filter criteria
          * @param {Object} filters - Filter criteria (type, search, minPrice, maxPrice)
          */
-        function displayProperties(filters = { type: 'all', search: '', minPrice: 0, maxPrice: Infinity }) {
+        async function displayProperties(filters = { type: 'all', search: '', minPrice: 0, maxPrice: Infinity }) {
+            // Carrega os imóveis do backend se ainda não foram carregados ou se for preciso recarregar
+            // A condição de carregamento é simplificada aqui para sempre buscar, mas pode ser otimizada
+            try {
+                const response = await fetch(`${API_URL}?action=get_properties`);
+                const data = await response.json();
+                properties = Array.isArray(data) ? data : []; // Garante que properties é um array
+            } catch (error) {
+                console.error("Erro ao carregar imóveis do backend:", error);
+                propertyList.innerHTML = '<p class="text-center text-red-600 col-span-full">Erro ao carregar imóveis. Tente novamente mais tarde.</p>';
+                return;
+            }
+
             propertyList.innerHTML = '';
             const filteredProperties = properties.filter(p => 
                 (filters.type === 'all' || p.type === filters.type) &&
-                p.price >= filters.minPrice &&
-                p.price <= filters.maxPrice &&
+                parseFloat(p.price) >= filters.minPrice && 
+                parseFloat(p.price) <= filters.maxPrice && 
                 (p.title.toLowerCase().includes(filters.search.toLowerCase()) ||
                  p.neighborhood.toLowerCase().includes(filters.search.toLowerCase()) ||
                  p.description.toLowerCase().includes(filters.search.toLowerCase()))
@@ -547,10 +517,16 @@
             filteredProperties.forEach(property => {
                 const propertyCard = document.createElement('article');
                 propertyCard.className = 'property-card bg-white rounded-lg overflow-hidden shadow-md transition duration-300';
+                
+                // Trata as imagens, que agora vêm como uma string separada por vírgulas
+                const imageUrls = typeof property.images === 'string' ? property.images.split(',').map(url => url.trim()) : property.images;
+                const displayImages = imageUrls.length > 0 ? imageUrls : ['https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'];
+
+
                 propertyCard.innerHTML = `
                     <div class="swiper">
                         <div class="swiper-wrapper">
-                            ${property.images.map(img => `
+                            ${displayImages.map(img => `
                                 <div class="swiper-slide">
                                     <picture>
                                         <source srcset="${img}&type=webp" type="image/webp">
@@ -593,7 +569,7 @@
                             </div>` : ''}
                         </div>
                         <div class="flex items-center justify-between mt-4">
-                            <span class="text-xl font-bold text-brand-blue">R$ ${property.price.toLocaleString('pt-BR')}</span>
+                            <span class="text-xl font-bold text-brand-blue">R$ ${parseFloat(property.price).toLocaleString('pt-BR')}</span>
                             <div class="space-x-2">
                                 <button class="details-btn bg-brand-blue text-white px-4 py-2 rounded hover:bg-blue-700 transition" data-id="${property.id}">Detalhes</button>
                                 <a href="#contato" class="bg-brand-green text-white px-4 py-2 rounded hover:bg-green-700 transition">Agendar Visita</a>
@@ -614,10 +590,14 @@
             document.querySelectorAll('.details-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const property = properties.find(p => p.id === parseInt(btn.dataset.id));
+                    if (!property) return; // Garante que a propriedade existe
+                    const imageUrlsModal = typeof property.images === 'string' ? property.images.split(',').map(url => url.trim()) : property.images;
+                    const displayImagesModal = imageUrlsModal.length > 0 ? imageUrlsModal : ['https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'];
+
                     document.getElementById('modalContent').innerHTML = `
                         <div class="swiper">
                             <div class="swiper-wrapper">
-                                ${property.images.map(img => `
+                                ${displayImagesModal.map(img => `
                                     <div class="swiper-slide">
                                         <picture>
                                             <source srcset="${img}&type=webp" type="image/webp">
@@ -631,7 +611,7 @@
                         </div>
                         <h3 id="modalTitle" class="text-2xl font-bold mt-4">${property.title}</h3>
                         <p class="text-gray-600 mt-2">${property.description}</p>
-                        <p class="text-xl font-bold text-brand-blue mt-2">R$ ${property.price.toLocaleString('pt-BR')}</p>
+                        <p class="text-xl font-bold text-brand-blue mt-2">R$ ${parseFloat(property.price).toLocaleString('pt-BR')}</p>
                         <p class="text-gray-600 mt-2"><strong>Bairro:</strong> ${property.neighborhood}</p>
                         <p class="text-gray-600"><strong>Área:</strong> ${property.area}m²</p>
                         ${property.bedrooms > 0 ? `<p class="text-gray-600"><strong>Quartos:</strong> ${property.bedrooms}</p>` : ''}
@@ -660,6 +640,7 @@
          */
         function displayAdminProperties() {
             adminPropertiesList.innerHTML = '';
+            // A lista de `properties` já foi carregada pela `displayProperties`
             properties.forEach(property => {
                 const propertyItem = document.createElement('div');
                 propertyItem.className = 'bg-gray-100 p-3 rounded-lg';
@@ -675,7 +656,7 @@
                         </div>
                     </div>
                     <div class="mt-2 flex justify-between text-sm">
-                        <span>R$ ${property.price.toLocaleString('pt-BR')}</span>
+                        <span>R$ ${parseFloat(property.price).toLocaleString('pt-BR')}</span>
                         <span>${property.area}m²</span>
                         <span>${property.bedrooms}Q ${property.bathrooms}B</span>
                     </div>
@@ -700,7 +681,7 @@
          * Adds a new property
          * @param {Event} e - Form submission event
          */
-        function addProperty(e) {
+        async function addProperty(e) {
             e.preventDefault();
             const price = parseFloat(document.getElementById('propertyPrice').value);
             const area = parseInt(document.getElementById('propertyArea').value);
@@ -710,7 +691,6 @@
             }
             const images = document.getElementById('propertyImages').value.split(',').map(img => img.trim()).filter(img => img);
             const newProperty = {
-                id: properties.length > 0 ? Math.max(...properties.map(p => p.id)) + 1 : 1,
                 title: document.getElementById('propertyTitle').value,
                 description: document.getElementById('propertyDescription').value,
                 price: price,
@@ -721,11 +701,30 @@
                 bathrooms: parseInt(document.getElementById('propertyBathrooms').value) || 0,
                 images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80']
             };
-            properties.push(newProperty);
-            addPropertyForm.reset();
-            displayProperties(getCurrentFilters());
-            displayAdminProperties();
-            alert('Imóvel adicionado com sucesso!');
+
+            try {
+                const response = await fetch(`${API_URL}?action=add_property`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newProperty)
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    properties = []; // Limpa a lista local para forçar o recarregamento do backend
+                    addPropertyForm.reset();
+                    displayProperties(getCurrentFilters());
+                    displayAdminProperties();
+                    alert('Imóvel adicionado com sucesso!');
+                } else {
+                    alert(result.message || 'Erro ao adicionar imóvel.');
+                }
+            } catch (error) {
+                console.error("Erro na requisição para adicionar imóvel:", error);
+                alert('Erro ao tentar adicionar imóvel.');
+            }
         }
 
         /**
@@ -743,7 +742,7 @@
             document.getElementById('propertyArea').value = property.area;
             document.getElementById('propertyBedrooms').value = property.bedrooms;
             document.getElementById('propertyBathrooms').value = property.bathrooms;
-            document.getElementById('propertyImages').value = property.images.join(', ');
+            document.getElementById('propertyImages').value = typeof property.images === 'string' ? property.images : property.images.join(', '); // Garante string
             addPropertyForm.removeEventListener('submit', addProperty);
             addPropertyForm.addEventListener('submit', (e) => updateProperty(e, id));
             addPropertyForm.querySelector('button[type="submit"]').textContent = 'Atualizar Imóvel';
@@ -754,7 +753,7 @@
          * @param {Event} e - Form submission event
          * @param {number} id - Property ID
          */
-        function updateProperty(e, id) {
+        async function updateProperty(e, id) {
             e.preventDefault();
             const price = parseFloat(document.getElementById('propertyPrice').value);
             const area = parseInt(document.getElementById('propertyArea').value);
@@ -763,9 +762,7 @@
                 return;
             }
             const images = document.getElementById('propertyImages').value.split(',').map(img => img.trim()).filter(img => img);
-            const propertyIndex = properties.findIndex(p => p.id === id);
-            if (propertyIndex === -1) return;
-            properties[propertyIndex] = {
+            const updatedProperty = {
                 id: id,
                 title: document.getElementById('propertyTitle').value,
                 description: document.getElementById('propertyDescription').value,
@@ -777,30 +774,71 @@
                 bathrooms: parseInt(document.getElementById('propertyBathrooms').value) || 0,
                 images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80']
             };
-            addPropertyForm.reset();
-            addPropertyForm.removeEventListener('submit', updateProperty);
-            addPropertyForm.addEventListener('submit', addProperty);
-            addPropertyForm.querySelector('button[type="submit"]').textContent = 'Adicionar Imóvel';
-            displayProperties(getCurrentFilters());
-            displayAdminProperties();
-            alert('Imóvel atualizado com sucesso!');
+
+            try {
+                const response = await fetch(`${API_URL}?action=update_property`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedProperty)
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    properties = []; // Limpa a lista local para forçar o recarregamento
+                    addPropertyForm.reset();
+                    addPropertyForm.removeEventListener('submit', updateProperty);
+                    addPropertyForm.addEventListener('submit', addProperty);
+                    addPropertyForm.querySelector('button[type="submit"]').textContent = 'Adicionar Imóvel';
+                    displayProperties(getCurrentFilters());
+                    displayAdminProperties();
+                    alert('Imóvel atualizado com sucesso!');
+                } else {
+                    alert(result.message || 'Erro ao atualizar imóvel.');
+                }
+            } catch (error) {
+                console.error("Erro na requisição para atualizar imóvel:", error);
+                alert('Erro ao tentar atualizar imóvel.');
+            }
         }
 
         /**
          * Deletes a property
          * @param {number} id - Property ID
          */
-        function deleteProperty(id) {
-            const propertyIndex = properties.findIndex(p => p.id === id);
-            if (propertyIndex === -1) return;
-            properties.splice(propertyIndex, 1);
-            displayProperties(getCurrentFilters());
-            displayAdminProperties();
-            alert('Imóvel excluído com sucesso!');
+        async function deleteProperty(id) {
+            if (!confirm('Tem certeza que deseja excluir este imóvel?')) {
+                return;
+            }
+            try {
+                const response = await fetch(`${API_URL}?action=delete_property`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id }) // Envia o ID do imóvel a ser deletado
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    properties = []; // Limpa a lista local para forçar o recarregamento
+                    displayProperties(getCurrentFilters());
+                    displayAdminProperties();
+                    alert('Imóvel excluído com sucesso!');
+                } else {
+                    alert(result.message || 'Erro ao excluir imóvel.');
+                }
+            } catch (error) {
+                console.error("Erro na requisição para excluir imóvel:", error);
+                alert('Erro ao tentar excluir imóvel.');
+            }
         }
 
         /**
          * Toggles favorite status for a property
+         * NOTE: This is purely client-side with localStorage.
+         * To make it persistent, you'd need another backend endpoint.
          * @param {number} id - Property ID
          */
         function toggleFavorite(id) {
@@ -830,20 +868,35 @@
          * Handles login
          * @param {Event} e - Form submission event
          */
-        function handleLogin(e) {
+        async function handleLogin(e) {
             e.preventDefault();
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            // TODO: Replace with backend authentication
-            if (username === adminCredentials.username && password === adminCredentials.password) {
-                isAdminLoggedIn = true;
-                localStorage.setItem('isAdminLoggedIn', 'true');
-                loginModal.classList.add('hidden');
-                loginModal.setAttribute('aria-hidden', 'true');
-                adminPanel.classList.remove('translate-x-full');
-                alert('Login realizado com sucesso!');
-            } else {
-                alert('Usuário ou senha incorretos!');
+
+            try {
+                const response = await fetch(`${API_URL}?action=login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    isAdminLoggedIn = true;
+                    localStorage.setItem('isAdminLoggedIn', 'true'); // Armazena estado no navegador
+                    loginModal.classList.add('hidden');
+                    loginModal.setAttribute('aria-hidden', 'true');
+                    adminPanel.classList.remove('translate-x-full');
+                    alert('Login realizado com sucesso!');
+                    displayAdminProperties(); // Atualiza painel admin com dados do backend
+                } else {
+                    alert(result.message || 'Usuário ou senha incorretos!');
+                }
+            } catch (error) {
+                console.error("Erro na requisição de login:", error);
+                alert('Erro ao tentar logar. Tente novamente.');
             }
         }
 
@@ -858,7 +911,7 @@
          * Handles contact form submission
          * @param {Event} e - Form submission event
          */
-        function handleContactSubmit(e) {
+        async function handleContactSubmit(e) {
             e.preventDefault();
             const email = document.getElementById('email').value;
             if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -866,9 +919,29 @@
                 return;
             }
             const name = document.getElementById('name').value;
-            // TODO: Send to backend API
-            alert(`Obrigado, ${name}! Sua mensagem foi enviada com sucesso. Entraremos em contato em breve.`);
-            contactForm.reset();
+            const phone = document.getElementById('phone').value;
+            const message = document.getElementById('message').value;
+
+            try {
+                const response = await fetch(`${API_URL}?action=send_contact`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email, phone, message })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(`Obrigado, ${name}! Sua mensagem foi enviada com sucesso. Entraremos em contato em breve.`);
+                    contactForm.reset();
+                } else {
+                    alert(result.message || 'Erro ao enviar mensagem. Tente novamente.');
+                }
+            } catch (error) {
+                console.error("Erro na requisição de contato:", error);
+                alert('Erro ao tentar enviar mensagem. Tente novamente.');
+            }
         }
 
         /**
@@ -888,11 +961,25 @@
             });
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('footerYear').textContent = `© ${new Date().getFullYear()} Oto Imóveis. Todos os direitos reservados.`;
-            displayProperties();
+
+            // Verifica o status de login no backend ao carregar a página
+            try {
+                const checkLoginResponse = await fetch(`${API_URL}?action=check_login`);
+                const loginStatus = await checkLoginResponse.json();
+                isAdminLoggedIn = loginStatus.isLoggedIn;
+                localStorage.setItem('isAdminLoggedIn', isAdminLoggedIn); // Sincroniza com localStorage
+            } catch (error) {
+                console.error("Erro ao verificar status de login:", error);
+                isAdminLoggedIn = false;
+                localStorage.removeItem('isAdminLoggedIn');
+            }
+
+            displayProperties(); // Exibe os imóveis carregados do backend
+
             if (isAdminLoggedIn) {
-                displayAdminProperties();
+                displayAdminProperties(); // Só exibe o painel admin se logado
                 adminPanel.classList.remove('translate-x-full');
             }
         });
@@ -902,7 +989,7 @@
                 adminPanel.classList.remove('translate-x-full');
             } else {
                 loginModal.classList.remove('hidden');
-                loginModal.setAttribute('aria-hidden', 'false');
+                loginModal.setAttribute('aria-hidden', 'true');
             }
         });
 
@@ -916,6 +1003,8 @@
         closeAdminPanel.addEventListener('click', () => {
             adminPanel.classList.add('translate-x-full');
         });
+
+        adminLogoutBtn.addEventListener('click', handleLogout); // Evento para o botão de logout
 
         addPropertyForm.addEventListener('submit', addProperty);
 
