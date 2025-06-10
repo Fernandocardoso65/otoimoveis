@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Oto Imóveis - Encontre casas, apartamentos e terrenos em Piedade, SP. Atendimento personalizado e imóveis exclusivos.">
+    <meta name="keywords" content="imóveis Piedade SP, casas à venda, apartamentos Piedade, Oto Imóveis">
+    <meta property="og:title" content="Oto Imóveis - Piedade, SP">
+    <meta property="og:description" content="Encontre seu imóvel ideal em Piedade com a Oto Imóveis.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <title>Oto Imóveis - Piedade, SP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .property-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+        #adminPanel {
+            transition: all 0.3s ease;
+        }
+        button:focus, a:focus, input:focus, select:focus, textarea:focus {
+            outline: 2px solid #2563eb;
+            outline-offset: 2px;
+        }
+        .active {
+            color: #ffffff;
+            font-weight: bold;
+            border-bottom: 2px solid #ffffff;
+        }
+        button, a {
+            min-width: 48px;
+            min-height: 48px;
+            padding: 12px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        .text-gray-400 {
+            color: #4B5563;
+        }
+        .swiper {
+            width: 100%;
+            height: 200px;
+        }
+    </style>
+    <!-- Replace with minified Tailwind CSS file -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-blue': '#1E40AF',
+                        'brand-green': '#10B981'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <a href="#main-content" class="absolute left-0 top-0 p-4 bg-brand-blue text-white transform -translate-y-full focus:translate-y-0">Pular para o conteúdo</a>
+    <header>
+        <nav class="bg-brand-blue text-white shadow-lg" role="navigation">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center">
+                    <i class="fas fa-home text-2xl mr-2"></i>
+                    <h1 class="text-xl font-bold">OTO IMÓVEIS</h1>
+                </div>
+                <div class="hidden md:flex space-x-6">
+                    <a href="#inicio" class="hover:text-blue-200 transition">Início</a>
+                    <a href="#imoveis" class="hover:text-blue-200 transition">Imóveis</a>
+                    <a href="#sobre" class="hover:text-blue-200 transition">Sobre Nós</a>
+                    <a href="#contato" class="hover:text-blue-200 transition">Contato</a>
+                </div>
+                <button id="adminLoginBtn" class="bg-white text-brand-blue px-4 py-2 rounded hover:bg-blue-100 transition">
+                    <i class="fas fa-sign-in-alt mr-2"></i>Área Restrita
+                </button>
+                <button class="md:hidden text-xl" id="mobileMenuBtn" aria-label="Abrir menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <div id="mobileMenu" class="hidden md:hidden bg-blue-900 px-4 py-2">
+                <a href="#inicio" class="block py-2 hover:bg-blue-800 px-2 rounded">Início</a>
+                <a href="#imoveis" class="block py-2 hover:bg-blue-800 px-2 rounded">Imóveis</a>
+                <a href="#sobre" class="block py-2 hover:bg-blue-800 px-2 rounded">Sobre Nós</a>
+                <a href="#contato" class="block py-2 hover:bg-blue-800 px-2 rounded">Contato</a>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content">
+        <div id="loginModal" role="dialog" aria-labelledby="loginTitle" aria-hidden="true" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="login-container rounded-lg p-8 max-w-md w-full">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 id="loginTitle" class="text-2xl font-bold text-brand-blue">Acesso Restrito</h2>
+                    <button id="closeLoginModal" aria-label="Fechar modal" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="loginForm">
+                    <div class="mb-4">
+                        <label for="username" class="block text-gray-700 mb-2">Usuário</label>
+                        <input type="text" id="username" class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-brand-blue" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="password" class="block text-gray-700 mb-2">Senha</label>
+                        <input type="password" id="password" class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-brand-blue" required>
+                    </div>
+                    <button type="submit" class="w-full bg-brand-blue text-white py-2 px-4 rounded hover:bg-blue-700 transition">Entrar</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="adminPanel" class="fixed right-0 top-0 bottom-0 w-80 bg-white shadow-lg transform translate-x-full z-40 p-4 overflow-y-auto">
+            <div class="flex justify-between items-center mb-6 border-b pb-4">
+                <h2 class="text-xl font-bold text-brand-blue">Painel Admin</h2>
+                <button id="closeAdminPanel" aria-label="Fechar painel" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div>
+                <h3 class="font-semibold mb-3">Adicionar Novo Imóvel</h3>
+                <form id="addPropertyForm" class="space-y-3">
+                    <div>
+                        <label class="block text-sm text-gray-600">Título</label>
+                        <input type="text" id="propertyTitle" class="w-full px-2 py-1 border rounded" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600">Descrição</label>
+                        <textarea id="propertyDescription" rows="3" class="w-full px-2 py-1 border rounded" required></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600">Preço</label>
+                        <input type="number" id="propertyPrice" min="1" class="w-full px-2 py-1 border rounded" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600">Tipo</label>
+                        <select id="propertyType" class="w-full px-2 py-1 border rounded">
+                            <option value="casa">Casa</option>
+                            <option value="apartamento">Apartamento</option>
+                            <option value="terreno">Terreno</option>
+                            <option value="comercial">Comercial</option>
+                            <option value="chacara">Chácara</option>
+                            <option value="sitio">Sítio</option>
+                            <option value="fazenda">Fazenda</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600">Bairro</label>
+                        <input type="text" id="propertyNeighborhood" class="w-full px-2 py-1 border rounded" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600">Área (m²)</label>
+                        <input type="number" id="propertyArea" min="1" class="w-full px-2 py-1 border rounded" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600">Quartos</label>
+                        <input type="number" id="propertyBedrooms" min="0" class="w-full px-2 py-1 border rounded">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600">Banheiros</label>
+                        <input type="number" id="propertyBathrooms" min="0" class="w-full px-2 py-1 border rounded">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-gray-600">URLs das Imagens (separadas por vírgula)</label>
+                        <input type="text" id="propertyImages" class="w-full px-2 py-1 border rounded" placeholder="Cole URLs de imagens, separadas por vírgula">
+                    </div>
+                    <button type="submit" class="w-full bg-brand-blue text-white py-2 px-4 rounded hover:bg-blue-700 transition mt-3">Adicionar Imóvel</button>
+                </form>
+                <div class="mt-8">
+                    <h3 class="font-semibold mb-3">Imóveis Cadastrados</h3>
+                    <div id="adminPropertiesList" class="space-y-3"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="propertyModal" role="dialog" aria-labelledby="modalTitle" aria-hidden="true" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-lg p-6 max-w-2xl w-full">
+                <button id="closePropertyModal" aria-label="Fechar modal" class="float-right text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div id="modalContent"></div>
+            </div>
+        </div>
+
+        <section id="inicio" class="relative bg-brand-blue text-white py-20" data-aos="fade-up">
+            <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <h2 class="text-4xl md:text-5xl font-bold mb-4">Encontre seu lar em Piedade</h2>
+                    <p class="text-xl mb-6">A Oto Imóveis oferece as melhores opções de imóveis na região de Piedade e arredores.</p>
+                    <div class="space-x-4">
+                        <a href="#imoveis" class="bg-white text-brand-blue px-6 py-3 rounded-lg font-semibold hover:bg-blue-100 transition inline-block">Ver Imóveis</a>
+                        <a href="#contato" class="bg-brand-green text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition inline-block">Agende uma Visita</a>
+                    </div>
+                </div>
+                <div class="md:w-1/2">
+                    <picture>
+                        <source srcset="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80&type=webp" type="image/webp">
+                        <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Casa moderna com jardim em Piedade" class="rounded-lg shadow-xl" loading="lazy">
+                    </picture>
+                </div>
+            </div>
+        </section>
+
+        <section id="imoveis" class="py-16 bg-gray-50" data-aos="fade-up">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Imóveis Disponíveis</h2>
+                    <p class="text-gray-600">Confira nossa seleção exclusiva em Piedade</p>
+                </div>
+                <div class="flex flex-wrap gap-4 mb-8 justify-center">
+                    <input type="text" id="propertySearch" placeholder="Buscar imóveis..." class="px-4 py-2 border rounded w-full max-w-md">
+                    <select id="propertyFilter" class="px-4 py-2 border rounded">
+                        <option value="all">Todos os Imóveis</option>
+                        <option value="casa">Casas</option>
+                        <option value="apartamento">Apartamentos</option>
+                        <option value="terreno">Terrenos</option>
+                        <option value="comercial">Comercial</option>
+                        <option value="chacara">Chácaras</option>
+                        <option value="sitio">Sítios</option>
+                        <option value="fazenda">Fazendas</option>
+                    </select>
+                    <input type="number" id="minPrice" placeholder="Preço Mín." class="px-4 py-2 border rounded">
+                    <input type="number" id="maxPrice" placeholder="Preço Máx." class="px-4 py-2 border rounded">
+                </div>
+                <div id="propertyList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+            </div>
+        </section>
+
+        <section id="sobre" class="py-16 bg-white" data-aos="fade-up">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row items-center">
+                    <div class="md:w-1/2 mb-10 md:mb-0 md:pr-10">
+                        <picture>
+                            <source srcset="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80&type=webp" type="image/webp">
+                            <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Equipe da Oto Imóveis em reunião" class="rounded-lg shadow-xl" loading="lazy">
+                        </picture>
+                    </div>
+                    <div class="md:w-1/2">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">Sobre a Oto Imóveis</h2>
+                        <p class="text-gray-600 mb-4">Há mais de 15 anos no mercado imobiliário de Piedade, a Oto Imóveis se destaca pelo atendimento personalizado e conhecimento profundo da região.</p>
+                        <p class="text-gray-600 mb-6">Nossa equipe é formada por corretores experientes e comprometidos em encontrar a melhor solução para cada cliente, seja na compra, venda ou locação de imóveis.</p>
+                        <div class="space-y-3">
+                            <div class="flex items-start">
+                                <i class="fas fa-check-circle text-brand-green mt-1 mr-2"></i>
+                                <p class="text-gray-700">Ampla carteira de imóveis em Piedade e região</p>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-check-circle text-brand-green mt-1 mr-2"></i>
+                                <p class="text-gray-700">Avaliação precisa e justa do seu imóvel</p>
+                            </div>
+                            <div class="flex items-start">
+                                <i alkoxy="fas fa-check-circle text-brand-green mt-1 mr-2"></i>
+                                <p class="text-gray-700">Atendimento personalizado e transparente</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contato" class="py-16 bg-blue-50" data-aos="fade-up">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Entre em Contato</h2>
+                    <p class="text-gray-600">Estamos à disposição para esclarecer suas dúvidas</p>
+                </div>
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="md:w-1/2 bg-white p-8 rounded-lg shadow-lg">
+                        <h3 class="text-xl font-semibold mb-4">Envie sua mensagem</h3>
+                        <form id="contactForm">
+                            <div class="mb-4">
+                                <label for="name" class="block text-gray-700 mb-2">Nome</label>
+                                <input type="text" id="name" class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-brand-blue" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="email" class="block text-gray-700 mb-2">E-mail</label>
+                                <input type="email" id="email" class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-brand-blue" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="phone" class="block text-gray-700 mb-2">Telefone</label>
+                                <input type="tel" id="phone" class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-brand-blue">
+                            </div>
+                            <div class="mb-4">
+                                <label for="message" class="block text-gray-700 mb-2">Mensagem</label>
+                                <textarea id="message" rows="4" class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-brand-blue" required></textarea>
+                            </div>
+                            <button type="submit" class="bg-brand-blue text-white py-2 px-6 rounded hover:bg-blue-700 transition">Enviar Mensagem</button>
+                        </form>
+                    </div>
+                    <div class="md:w-1/2">
+                        <div class="bg-white p-8 rounded-lg shadow-lg h-full">
+                            <h3 class="text-xl font-semibold mb-4">Nossas Informações</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <i class="fas fa-map-marker-alt text-brand-blue mt-1 mr-3"></i>
+                                    <div>
+                                        <h4 class="font-medium">Endereço</h4>
+                                        <p class="text-gray-600">Rua Coronel Oliveira, 123 - Centro, Piedade - SP</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <i class="fas fa-phone-alt text-brand-blue mt-1 mr-3"></i>
+                                    <div>
+                                        <h4 class="font-medium">Telefone</h4>
+                                        <p class="text-gray-600">(15) 9999-9999</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <i class="fas fa-envelope text-brand-blue mt-1 mr-3"></i>
+                                    <div>
+                                        <h4 class="font-medium">E-mail</h4>
+                                        <p class="text-gray-600">contato@otoimoveis.com.br</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <i class="fas fa-clock text-brand-blue mt-1 mr-3"></i>
+                                    <div>
+                                        <h4 class="font-medium">Horário de Atendimento</h4>
+                                        <p class="text-gray-600">Segunda a Sexta: 09h às 18h<br>Sábado: 09h às 13h</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-6">
+                                <h4 class="font-medium mb-3">Nos siga nas redes sociais</h4>
+                                <div class="flex space-x-4">
+                                    <a href="https://wa.me/5515999999999" class="text-brand-green hover:text-green-700">
+                                        <i class="fab fa-whatsapp text-xl"></i>
+                                    </a>
+                                    <a href="#" class="text-blue-600 hover:text-blue-800">
+                                        <i class="fab fa-facebook-f text-xl"></i>
+                                    </a>
+                                    <a href="#" class="text-blue-400 hover:text-blue-600">
+                                        <i class="fab fa-twitter text-xl"></i>
+                                    </a>
+                                    <a href="#" class="text-pink-600 hover:text-pink-800">
+                                        <i class="fab fa-instagram text-xl"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between">
+                <div class="mb-6 md:mb-0">
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-home text-2xl mr-2"></i>
+                        <h3 class="text-xl font-bold">OTO IMÓVEIS</h3>
+                    </div>
+                    <p class="text-gray-400">Sua parceira imobiliária em Piedade e região</p>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
+                    <div>
+                        <h4 class="font-semibold mb-3">Links</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#inicio" class="text-gray-400 hover:text-white transition">Início</a></li>
+                            <li><a href="#imoveis" class="text-gray-400 hover:text-white transition">Imóveis</a></li>
+                            <li><a href="#sobre" class="text-gray-400 hover:text-white transition">Sobre Nós</a></li>
+                            <li><a href="#contato" class="text-gray-400 hover:text-white transition">Contato</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-3">Tipos de Imóveis</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#imoveis" class="text-gray-400 hover:text-white transition filter-link" data-type="casa">Casas</a></li>
+                            <li><a href="#imoveis" class="text-gray-400 hover:text-white transition filter-link" data-type="apartamento">Apartamentos</a></li>
+                            <li><a href="#imoveis" class="text-gray-400 hover:text-white transition filter-link" data-type="terreno">Terrenos</a></li>
+                            <li><a href="#imoveis" class="text-gray-400 hover:text-white transition filter-link" data-type="comercial">Comercial</a></li>
+                            <li><a href="#imoveis" class="text-gray-400 hover:text-white transition filter-link" data-type="chacara">Chácaras</a></li>
+                            <li><a href="#imoveis" class="text-gray-400 hover:text-white transition filter-link" data-type="sitio">Sítios</a></li>
+                            <li><a href="#imoveis" class="text-gray-400 hover:text-white transition filter-link" data-type="fazenda">Fazendas</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-3">Contato</h4>
+                        <ul class="space-y-2">
+                            <li class="text-gray-400">Rua Coronel Oliveira, 123</li>
+                            <li class="text-gray-400">Piedade - SP</li>
+                            <li class="text-gray-400">contato@otoimoveis.com.br</li>
+                            <li class="text-gray-400">(15) 9999-9999</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400">
+                <p id="footerYear"></p>
+                <p class="mt-1 text-sm">Desenvolvido com paixão para Piedade</p>
+            </div>
+        </div>
+    </footer>
+
+    <button id="backToTop" class="fixed bottom-6 right-6 bg-brand-blue text-white p-3 rounded-full shadow-lg opacity-0 invisible transition-opacity duration-300" aria-label="Voltar ao topo">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "RealEstateAgent",
+        "name": "Oto Imóveis",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Rua Coronel Oliveira, 123",
+            "addressLocality": "Piedade",
+            "addressRegion": "SP",
+            "postalCode": "18170-000"
+        },
+        "telephone": "(15) 9999-9999"
+    }
+    </script>
+    <!-- Replace UA-XXXXX-Y with your Google Analytics tracking ID -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-XXXXX-Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-XXXXX-Y');
+    </script>
+    <script defer>
+        AOS.init();
+
+        const properties = [
+            {
+                id: 1,
+                title: "Casa com 3 Quartos no Centro",
+                description: "Ótima casa localizada no centro de Piedade, com 3 quartos, 2 banheiros, garagem para 2 carros e quintal espaçoso.",
+                price: 450000,
+                type: "casa",
+                neighborhood: "Centro",
+                area: 180,
+                bedrooms: 3,
+                bathrooms: 2,
+                images: ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 2,
+                title: "Apartamento Moderno à Venda",
+                description: "Apartamento novo com 2 dormitórios, sala ampla, cozinha americana e área de lazer completa com piscina e churrasqueira.",
+                price: 320000,
+                type: "apartamento",
+                neighborhood: "Jardim São Paulo",
+                area: 85,
+                bedrooms: 2,
+                bathrooms: 2,
+                images: ["https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 3,
+                title: "Terreno Residencial 300m²",
+                description: "Excelente terreno residencial, plano e sem buracos, com ótima localização próximo ao centro da cidade.",
+                price: 180000,
+                type: "terreno",
+                neighborhood: "Vila São Pedro",
+                area: 300,
+                bedrooms: 0,
+                bathrooms: 0,
+                images: ["https://images.unsplash.com/photo-1600304594525-2a484e6d3ed4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            },
+            {
+                id: 4,
+                title: "Sala Comercial Bem Localizada",
+                description: "Sala comercial com excelente fluxo de pessoas, ideal para diversos tipos de negócios. Reformada recentemente.",
+                price: 250000,
+                type: "comercial",
+                neighborhood: "Centro",
+                area: 65,
+                bedrooms: 0,
+                bathrooms: 1,
+                images: ["https://images.unsplash.com/photo-1497366754035-f200968a6e72?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"]
+            }
+        ];
+
+        const propertyList = document.getElementById('propertyList');
+        const loginModal = document.getElementById('loginModal');
+        const adminLoginBtn = document.getElementById('adminLoginBtn');
+        const closeLoginModal = document.getElementById('closeLoginModal');
+        const loginForm = document.getElementById('loginForm');
+        const adminPanel = document.getElementById('adminPanel');
+        const closeAdminPanel = document.getElementById('closeAdminPanel');
+        const addPropertyForm = document.getElementById('addPropertyForm');
+        const adminPropertiesList = document.getElementById('adminPropertiesList');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const backToTopBtn = document.getElementById('backToTop');
+        const contactForm = document.getElementById('contactForm');
+        const propertyModal = document.getElementById('propertyModal');
+        const closePropertyModal = document.getElementById('closePropertyModal');
+        const propertyFilter = document.getElementById('propertyFilter');
+        const propertySearch = document.getElementById('propertySearch');
+        const minPrice = document.getElementById('minPrice');
+        const maxPrice = document.getElementById('maxPrice');
+
+        const adminCredentials = {
+            username: 'admin',
+            password: 'piedade123'
+        };
+
+        let isAdminLoggedIn = localStorage.getItem('isAdminLoggedIn') === 'true';
+        let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+
+        /**
+         * Displays properties based on filter criteria
+         * @param {Object} filters - Filter criteria (type, search, minPrice, maxPrice)
+         */
+        function displayProperties(filters = { type: 'all', search: '', minPrice: 0, maxPrice: Infinity }) {
+            propertyList.innerHTML = '';
+            const filteredProperties = properties.filter(p => 
+                (filters.type === 'all' || p.type === filters.type) &&
+                p.price >= filters.minPrice &&
+                p.price <= filters.maxPrice &&
+                (p.title.toLowerCase().includes(filters.search.toLowerCase()) ||
+                 p.neighborhood.toLowerCase().includes(filters.search.toLowerCase()) ||
+                 p.description.toLowerCase().includes(filters.search.toLowerCase()))
+            );
+
+            if (filteredProperties.length === 0) {
+                propertyList.innerHTML = '<p class="text-center text-gray-600 col-span-full">Nenhum imóvel encontrado.</p>';
+                return;
+            }
+
+            filteredProperties.forEach(property => {
+                const propertyCard = document.createElement('article');
+                propertyCard.className = 'property-card bg-white rounded-lg overflow-hidden shadow-md transition duration-300';
+                propertyCard.innerHTML = `
+                    <div class="swiper">
+                        <div class="swiper-wrapper">
+                            ${property.images.map(img => `
+                                <div class="swiper-slide">
+                                    <picture>
+                                        <source srcset="${img}&type=webp" type="image/webp">
+                                        <img src="${img}" alt="${property.title}" class="w-full h-48 object-cover" loading="lazy">
+                                    </picture>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-semibold text-gray-800">${property.title}</h3>
+                            <div class="flex items-center space-x-2">
+                                <span class="bg-blue-100 text-brand-blue text-xs px-2 py-1 rounded">${property.type.charAt(0).toUpperCase() + property.type.slice(1)}</span>
+                                <button class="favorite-btn" data-id="${property.id}" aria-label="${favorites.includes(property.id) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}">
+                                    <i class="fas fa-heart ${favorites.includes(property.id) ? 'text-red-600' : 'text-gray-400'}"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center text-gray-600 mb-2">
+                            <i class="fas fa-map-marker-alt text-sm mr-1"></i>
+                            <span class="text-sm">${property.neighborhood}, Piedade - SP</span>
+                        </div>
+                        <div class="flex flex-wrap gap-y-2 gap-x-4 text-sm mb-3">
+                            <div class="flex items-center text-gray-600">
+                                <i class="fas fa-ruler-combined mr-1"></i>
+                                <span>${property.area}m²</span>
+                            </div>
+                            ${property.bedrooms > 0 ? `
+                            <div class="flex items-center text-gray-600">
+                                <i class="fas fa-bed mr-1"></i>
+                                <span>${property.bedrooms} quarto${property.bedrooms > 1 ? 's' : ''}</span>
+                            </div>` : ''}
+                            ${property.bathrooms > 0 ? `
+                            <div class="flex items-center text-gray-600">
+                                <i class="fas fa-bath mr-1"></i>
+                                <span>${property.bathrooms} banheiro${property.bathrooms > 1 ? 's' : ''}</span>
+                            </div>` : ''}
+                        </div>
+                        <div class="flex items-center justify-between mt-4">
+                            <span class="text-xl font-bold text-brand-blue">R$ ${property.price.toLocaleString('pt-BR')}</span>
+                            <div class="space-x-2">
+                                <button class="details-btn bg-brand-blue text-white px-4 py-2 rounded hover:bg-blue-700 transition" data-id="${property.id}">Detalhes</button>
+                                <a href="#contato" class="bg-brand-green text-white px-4 py-2 rounded hover:bg-green-700 transition">Agendar Visita</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                propertyList.appendChild(propertyCard);
+                new Swiper(propertyCard.querySelector('.swiper'), {
+                    navigation: {
+                        nextEl: '.swiper-button-next',
+                        prevEl: '.swiper-button-prev'
+                    },
+                    loop: true
+                });
+            });
+
+            document.querySelectorAll('.details-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const property = properties.find(p => p.id === parseInt(btn.dataset.id));
+                    document.getElementById('modalContent').innerHTML = `
+                        <div class="swiper">
+                            <div class="swiper-wrapper">
+                                ${property.images.map(img => `
+                                    <div class="swiper-slide">
+                                        <picture>
+                                            <source srcset="${img}&type=webp" type="image/webp">
+                                            <img src="${img}" alt="${property.title}" class="w-full h-64 object-cover rounded" loading="lazy">
+                                        </picture>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="swiper-button-next"></div>
+                            <div class="swiper-button-prev"></div>
+                        </div>
+                        <h3 id="modalTitle" class="text-2xl font-bold mt-4">${property.title}</h3>
+                        <p class="text-gray-600 mt-2">${property.description}</p>
+                        <p class="text-xl font-bold text-brand-blue mt-2">R$ ${property.price.toLocaleString('pt-BR')}</p>
+                        <p class="text-gray-600 mt-2"><strong>Bairro:</strong> ${property.neighborhood}</p>
+                        <p class="text-gray-600"><strong>Área:</strong> ${property.area}m²</p>
+                        ${property.bedrooms > 0 ? `<p class="text-gray-600"><strong>Quartos:</strong> ${property.bedrooms}</p>` : ''}
+                        ${property.bathrooms > 0 ? `<p class="text-gray-600"><strong>Banheiros:</strong> ${property.bathrooms}</p>` : ''}
+                        <a href="#contato" class="bg-brand-green text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition inline-block mt-4">Agendar Visita</a>
+                    `;
+                    propertyModal.classList.remove('hidden');
+                    propertyModal.setAttribute('aria-hidden', 'false');
+                    new Swiper(document.querySelector('#modalContent .swiper'), {
+                        navigation: {
+                            nextEl: '.swiper-button-next',
+                            prevEl: '.swiper-button-prev'
+                        },
+                        loop: true
+                    });
+                });
+            });
+
+            document.querySelectorAll('.favorite-btn').forEach(btn => {
+                btn.addEventListener('click', () => toggleFavorite(parseInt(btn.dataset.id)));
+            });
+        }
+
+        /**
+         * Displays properties in admin panel
+         */
+        function displayAdminProperties() {
+            adminPropertiesList.innerHTML = '';
+            properties.forEach(property => {
+                const propertyItem = document.createElement('div');
+                propertyItem.className = 'bg-gray-100 p-3 rounded-lg';
+                propertyItem.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-medium">${property.title}</h4>
+                            <p class="text-sm text-gray-600">${property.neighborhood} • ${property.type.charAt(0).toUpperCase() + property.type.slice(1)}</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="edit-property text-brand-blue hover:text-blue-800" data-id="${property.id}" aria-label="Editar imóvel"><i class="fas fa-edit"></i></button>
+                            <button class="delete-property text-red-600 hover:text-red-800" data-id="${property.id}" aria-label="Excluir imóvel"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+                    <div class="mt-2 flex justify-between text-sm">
+                        <span>R$ ${property.price.toLocaleString('pt-BR')}</span>
+                        <span>${property.area}m²</span>
+                        <span>${property.bedrooms}Q ${property.bathrooms}B</span>
+                    </div>
+                `;
+                adminPropertiesList.appendChild(propertyItem);
+            });
+
+            document.querySelectorAll('.edit-property').forEach(btn => {
+                btn.addEventListener('click', (e) => editProperty(parseInt(e.currentTarget.dataset.id)));
+            });
+
+            document.querySelectorAll('.delete-property').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (confirm('Tem certeza que deseja excluir este imóvel?')) {
+                        deleteProperty(parseInt(e.currentTarget.dataset.id));
+                    }
+                });
+            });
+        }
+
+        /**
+         * Adds a new property
+         * @param {Event} e - Form submission event
+         */
+        function addProperty(e) {
+            e.preventDefault();
+            const price = parseFloat(document.getElementById('propertyPrice').value);
+            const area = parseInt(document.getElementById('propertyArea').value);
+            if (price <= 0 || area <= 0) {
+                alert('Preço e área devem ser maiores que zero.');
+                return;
+            }
+            const images = document.getElementById('propertyImages').value.split(',').map(img => img.trim()).filter(img => img);
+            const newProperty = {
+                id: properties.length > 0 ? Math.max(...properties.map(p => p.id)) + 1 : 1,
+                title: document.getElementById('propertyTitle').value,
+                description: document.getElementById('propertyDescription').value,
+                price: price,
+                type: document.getElementById('propertyType').value,
+                neighborhood: document.getElementById('propertyNeighborhood').value,
+                area: area,
+                bedrooms: parseInt(document.getElementById('propertyBedrooms').value) || 0,
+                bathrooms: parseInt(document.getElementById('propertyBathrooms').value) || 0,
+                images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80']
+            };
+            properties.push(newProperty);
+            addPropertyForm.reset();
+            displayProperties(getCurrentFilters());
+            displayAdminProperties();
+            alert('Imóvel adicionado com sucesso!');
+        }
+
+        /**
+         * Edits an existing property
+         * @param {number} id - Property ID
+         */
+        function editProperty(id) {
+            const property = properties.find(p => p.id === id);
+            if (!property) return;
+            document.getElementById('propertyTitle').value = property.title;
+            document.getElementById('propertyDescription').value = property.description;
+            document.getElementById('propertyPrice').value = property.price;
+            document.getElementById('propertyType').value = property.type;
+            document.getElementById('propertyNeighborhood').value = property.neighborhood;
+            document.getElementById('propertyArea').value = property.area;
+            document.getElementById('propertyBedrooms').value = property.bedrooms;
+            document.getElementById('propertyBathrooms').value = property.bathrooms;
+            document.getElementById('propertyImages').value = property.images.join(', ');
+            addPropertyForm.removeEventListener('submit', addProperty);
+            addPropertyForm.addEventListener('submit', (e) => updateProperty(e, id));
+            addPropertyForm.querySelector('button[type="submit"]').textContent = 'Atualizar Imóvel';
+        }
+
+        /**
+         * Updates an existing property
+         * @param {Event} e - Form submission event
+         * @param {number} id - Property ID
+         */
+        function updateProperty(e, id) {
+            e.preventDefault();
+            const price = parseFloat(document.getElementById('propertyPrice').value);
+            const area = parseInt(document.getElementById('propertyArea').value);
+            if (price <= 0 || area <= 0) {
+                alert('Preço e área devem ser maiores que zero.');
+                return;
+            }
+            const images = document.getElementById('propertyImages').value.split(',').map(img => img.trim()).filter(img => img);
+            const propertyIndex = properties.findIndex(p => p.id === id);
+            if (propertyIndex === -1) return;
+            properties[propertyIndex] = {
+                id: id,
+                title: document.getElementById('propertyTitle').value,
+                description: document.getElementById('propertyDescription').value,
+                price: price,
+                type: document.getElementById('propertyType').value,
+                neighborhood: document.getElementById('propertyNeighborhood').value,
+                area: area,
+                bedrooms: parseInt(document.getElementById('propertyBedrooms').value) || 0,
+                bathrooms: parseInt(document.getElementById('propertyBathrooms').value) || 0,
+                images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80']
+            };
+            addPropertyForm.reset();
+            addPropertyForm.removeEventListener('submit', updateProperty);
+            addPropertyForm.addEventListener('submit', addProperty);
+            addPropertyForm.querySelector('button[type="submit"]').textContent = 'Adicionar Imóvel';
+            displayProperties(getCurrentFilters());
+            displayAdminProperties();
+            alert('Imóvel atualizado com sucesso!');
+        }
+
+        /**
+         * Deletes a property
+         * @param {number} id - Property ID
+         */
+        function deleteProperty(id) {
+            const propertyIndex = properties.findIndex(p => p.id === id);
+            if (propertyIndex === -1) return;
+            properties.splice(propertyIndex, 1);
+            displayProperties(getCurrentFilters());
+            displayAdminProperties();
+            alert('Imóvel excluído com sucesso!');
+        }
+
+        /**
+         * Toggles favorite status for a property
+         * @param {number} id - Property ID
+         */
+        function toggleFavorite(id) {
+            if (favorites.includes(id)) {
+                favorites = favorites.filter(f => f !== id);
+            } else {
+                favorites.push(id);
+            }
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            displayProperties(getCurrentFilters());
+        }
+
+        /**
+         * Gets current filter values
+         * @returns {Object} Current filter values
+         */
+        function getCurrentFilters() {
+            return {
+                type: propertyFilter.value,
+                search: propertySearch.value,
+                minPrice: parseFloat(minPrice.value) || 0,
+                maxPrice: parseFloat(maxPrice.value) || Infinity
+            };
+        }
+
+        /**
+         * Handles login
+         * @param {Event} e - Form submission event
+         */
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            // TODO: Replace with backend authentication
+            if (username === adminCredentials.username && password === adminCredentials.password) {
+                isAdminLoggedIn = true;
+                localStorage.setItem('isAdminLoggedIn', 'true');
+                loginModal.classList.add('hidden');
+                loginModal.setAttribute('aria-hidden', 'true');
+                adminPanel.classList.remove('translate-x-full');
+                alert('Login realizado com sucesso!');
+            } else {
+                alert('Usuário ou senha incorretos!');
+            }
+        }
+
+        /**
+         * Toggles mobile menu
+         */
+        function toggleMobileMenu() {
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        /**
+         * Handles contact form submission
+         * @param {Event} e - Form submission event
+         */
+        function handleContactSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                alert('Por favor, insira um e-mail válido.');
+                return;
+            }
+            const name = document.getElementById('name').value;
+            // TODO: Send to backend API
+            alert(`Obrigado, ${name}! Sua mensagem foi enviada com sucesso. Entraremos em contato em breve.`);
+            contactForm.reset();
+        }
+
+        /**
+         * Updates active navigation link based on scroll position
+         */
+        function updateActiveNav() {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('nav a');
+            let current = '';
+            sections.forEach(section => {
+                if (window.pageYOffset >= section.offsetTop - 60) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.toggle('active', link.getAttribute('href') === `#${current}`);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('footerYear').textContent = `© ${new Date().getFullYear()} Oto Imóveis. Todos os direitos reservados.`;
+            displayProperties();
+            if (isAdminLoggedIn) {
+                displayAdminProperties();
+                adminPanel.classList.remove('translate-x-full');
+            }
+        });
+
+        adminLoginBtn.addEventListener('click', () => {
+            if (isAdminLoggedIn) {
+                adminPanel.classList.remove('translate-x-full');
+            } else {
+                loginModal.classList.remove('hidden');
+                loginModal.setAttribute('aria-hidden', 'false');
+            }
+        });
+
+        closeLoginModal.addEventListener('click', () => {
+            loginModal.classList.add('hidden');
+            loginModal.setAttribute('aria-hidden', 'true');
+        });
+
+        loginForm.addEventListener('submit', handleLogin);
+
+        closeAdminPanel.addEventListener('click', () => {
+            adminPanel.classList.add('translate-x-full');
+        });
+
+        addPropertyForm.addEventListener('submit', addProperty);
+
+        closePropertyModal.addEventListener('click', () => {
+            propertyModal.classList.add('hidden');
+            propertyModal.setAttribute('aria-hidden', 'true');
+        });
+
+        [propertyFilter, propertySearch, minPrice, maxPrice].forEach(input => {
+            input.addEventListener('change', () => displayProperties(getCurrentFilters()));
+            input.addEventListener('input', () => displayProperties(getCurrentFilters()));
+        });
+
+        document.querySelectorAll('.filter-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const filterType = e.currentTarget.dataset.type;
+                propertyFilter.value = filterType;
+                displayProperties(getCurrentFilters());
+                document.getElementById('imoveis').scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.remove('opacity-0', 'invisible');
+                backToTopBtn.classList.add('opacity-100', 'visible');
+            } else {
+                backToTopBtn.classList.remove('opacity-100', 'visible');
+                backToTopBtn.classList.add('opacity-0', 'invisible');
+            }
+            updateActiveNav();
+        });
+
+        contactForm.addEventListener('submit', handleContactSubmit);
+    </script>
+</body>
+</html>
