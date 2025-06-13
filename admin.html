@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Oto Imóveis</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        form { margin: 20px 0; }
+        input, textarea, button { margin: 10px 0; padding: 8px; width: 100%; }
+        button { background-color: #007bff; color: white; border: none; padding: 10px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>Publicar Imóvel</h1>
+    <form id="uploadForm">
+        <label for="title">Título:</label>
+        <input type="text" id="title" name="title" required><br>
+        <label for="description">Descrição:</label>
+        <textarea id="description" name="description" required></textarea><br>
+        <button type="button" id="uploadWidget">Upload de Foto</button>
+        <p id="photoURL" style="display:none;"></p>
+        <button type="submit">Publicar</button>
+    </form>
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
