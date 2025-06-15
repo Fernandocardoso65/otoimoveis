@@ -15,7 +15,7 @@ const db = firebase.firestore();
 // Configuração do Cloudinary
 const cloudinaryWidget = cloudinary.createUploadWidget({
   cloudName: 'djqu0ov54',
-  uploadPreset: 'otoimoveis_upload'
+  uploadPreset: 'oto_upload'
 }, (error, result) => {
   if (!error && result && result.event === "success") {
     const photoURL = result.info.secure_url;
