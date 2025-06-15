@@ -501,7 +501,7 @@
         var cloudinary = window.cloudinary;
         var cloudinaryWidget = cloudinary.createUploadWidget({
             cloudName: 'djqu0ov54', // Substitua pelo seu Cloud Name
-            uploadPreset: 'SEU_UPLOAD_PRESET' // Substitua pelo seu Upload Preset
+            uploadPreset: 'oto_upload' // Substitua pelo seu Upload Preset
         }, function(error, result) {
             if (!error && result && result.event === "success") {
                 photoURL.textContent = result.info.secure_url;
